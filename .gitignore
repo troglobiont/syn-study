@@ -5,6 +5,7 @@ node_modules/
 **/local.properties
 **/*.jks
 **/*.keystore
+**/*.p12
 **/*.pk8
 **/*password*
 private/

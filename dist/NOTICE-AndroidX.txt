@@ -1,0 +1,7 @@
+Android application includes AndroidX WebKit and its AndroidX dependencies.
+Copyright The Android Open Source Project.
+Licensed under the Apache License, Version 2.0. See LICENSE-AndroidX-2.0.txt.
+Project: https://developer.android.com/jetpack/androidx/releases/webkit
+
+The SYN Study lesson text, questions and vector graphics are original project content.
+This notice does not grant an additional license to the project's original content.
