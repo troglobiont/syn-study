@@ -98,7 +98,18 @@ public final class LearningJourneyTest {
         try {
             await("document.querySelector('.brand')!==null");
             UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-            assertTrue("Rendered home",device.findObject(new UiSelector().textContains("Математический")).waitForExists(30000));
+            // A cold emulator can show a launcher ANR over the app. Dismiss only that
+            // unrelated system dialog; an ANR naming SYN remains a test failure.
+            UiObject homeTitle=device.findObject(new UiSelector().textContains("Математический"));
+            for(int pass=0;pass<6;pass++) {
+                UiObject launcher=device.findObject(new UiSelector().textContains("Pixel Launcher"));
+                if(launcher.exists()) {
+                    UiObject closeLauncher=device.findObject(new UiSelector().text("Close app"));
+                    if(closeLauncher.exists())closeLauncher.click();
+                }
+                if(homeTitle.waitForExists(5000))break;
+            }
+            assertTrue("Rendered home",homeTitle.exists());
             device.waitForIdle();
             device.executeShellCommand("screencap -p /sdcard/Download/SYN-Study-home.png");
             assertEquals(PackageManager.PERMISSION_DENIED,

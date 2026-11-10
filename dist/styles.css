@@ -49,3 +49,5 @@
 .model-control input { width:100%; }
 .worked-example li { margin:.8rem 0; line-height:1.7; }
 .insight-mark { overflow-wrap:anywhere; font-size:clamp(1.5rem,4vw,3rem); }
+.hero h1 { font-size:clamp(2.3rem,4.5vw,3.6rem); overflow-wrap:anywhere; }
+.hero>div { min-width:0; }
