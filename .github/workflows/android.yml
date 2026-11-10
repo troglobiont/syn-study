@@ -53,13 +53,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            gradle -p android --no-daemon connectedDebugAndroidTest
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            adb shell am start -W -n io.github.troglobiont.synstudy/.MainActivity
-            for attempt in $(seq 1 30); do adb shell uiautomator dump /sdcard/syn-ready.xml >/dev/null 2>&1; if adb shell cat /sdcard/syn-ready.xml | grep -q 'Знакомое'; then break; fi; sleep 1; done
-            adb shell cat /sdcard/syn-ready.xml | grep -q 'Знакомое'
-            adb shell screencap -p /sdcard/syn-home.png
-            adb pull /sdcard/syn-home.png native-artifact/Android_Home.png
+            gradle -p android --no-daemon connectedDebugAndroidTest; result=$?; adb pull /sdcard/Download/SYN-Study-last.png native-artifact/Android_Last.png; adb pull /sdcard/Download/SYN-Study-home.png native-artifact/Android_Home.png; capture=$?; if [ "$result" -ne 0 ]; then exit "$result"; fi; exit "$capture"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -68,4 +62,5 @@ jobs:
             android/app/build/reports/androidTests/
             android/app/build/outputs/androidTest-results/
             native-artifact/Android_Home.png
+            native-artifact/Android_Last.png
           retention-days: 14

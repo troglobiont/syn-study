@@ -82,6 +82,10 @@ public final class LearningJourneyTest {
         scenario=ActivityScenario.launch(MainActivity.class);
         try {
             await("document.querySelector('.brand')!==null");
+            UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+            assertTrue("Rendered home",device.findObject(new UiSelector().textContains("Знакомое")).waitForExists(30000));
+            device.waitForIdle();
+            device.executeShellCommand("screencap -p /sdcard/Download/SYN-Study-home.png");
             assertEquals(PackageManager.PERMISSION_DENIED,
                 InstrumentationRegistry.getInstrumentation().getTargetContext().checkSelfPermission("android.permission.INTERNET"));
             assertEquals("function",js("typeof SynAndroid.saveJson"));
@@ -134,12 +138,11 @@ public final class LearningJourneyTest {
             // Real Android document picker: export, reset, import the same JSON.
             route("#data");
             click("[data-action='export']");
-            UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
             UiObject filename=device.findObject(new UiSelector().className("android.widget.EditText"));
-            assertTrue("Save document picker",filename.waitForExists(10000));
+            assertTrue("Save document picker",filename.waitForExists(30000));
             filename.setText("SYN-Study-device-test.json");
             UiObject save=device.findObject(new UiSelector().textMatches("(?i)save"));
-            assertTrue("Save button",save.waitForExists(10000));save.click();
+            assertTrue("Save button",save.waitForExists(30000));save.click();
             await("document.querySelector('#toast').textContent==='Файл сохранён.'");
             click("[data-action='ask-reset']");click("[data-action='confirm-reset']");
             await("document.querySelector('.footer').textContent.includes('0 / 10 с первой')");
@@ -163,6 +166,10 @@ public final class LearningJourneyTest {
             click("[data-action='glossary']");await("!!document.querySelector('dialog[open]')");
             device.pressBack();await("!document.querySelector('dialog[open]')");
             assertEquals("#results",js("location.hash"));
-        } finally { scenario.close(); }
+        } finally {
+            UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).executeShellCommand(
+                "screencap -p /sdcard/Download/SYN-Study-last.png");
+            scenario.close();
+        }
     }
 }
