@@ -1,5 +1,6 @@
 import {VERSION,BY_ID,PRACTICE,TEST,QUESTIONS,CHAPTERS} from './content.js';
 import {normaliseModels} from './models.js';
+import {normaliseFoundation} from './foundation-models.js';
 export const MAIN_KEY='syn-study:progress:v1';
 export const SANDBOX_KEY='syn-study:sandbox:v1';
 export const MODE_KEY='syn-study:mode:v1';
@@ -10,7 +11,7 @@ const stages=['meaning','lab','practice','insight'];
 const pages=['home','lesson','test','results','review','data'];
 const error = message=>{throw new Error(message);};
 export function fresh(){
- return {schemaVersion:1,contentVersion:VERSION,records:{},chapters:Object.fromEntries(CHAPTERS.map(c=>[c.id,{stage:'meaning',index:0,visited:[],collected:false}])),models:normaliseModels(),labs:{relation:'valid',relationInput:0,preset:'wide',input:1,checked:false},test:{draft:null,runs:[]},prefs:{reduceMotion:false},resume:{page:'home',chapter:'one'}};
+ return {schemaVersion:1,contentVersion:VERSION,records:{},chapters:Object.fromEntries(CHAPTERS.map(c=>[c.id,{stage:'meaning',index:0,visited:[],collected:false}])),models:normaliseModels(),foundation:normaliseFoundation(),labs:{relation:'valid',relationInput:0,preset:'wide',input:1,checked:false},test:{draft:null,runs:[]},prefs:{reduceMotion:false},resume:{page:'home',chapter:'one'}};
 }
 export function parseNumber(raw){
  if(typeof raw!=='string'||raw.length>80)return null;
@@ -130,14 +131,14 @@ function testAnswers(raw){
 }
 export function normalise(raw){
  // Existing question identities, answers and test scopes survive additive course updates.
- if(!obj(raw)||raw.schemaVersion!==1||!['1.0.0','1.0.1',VERSION].includes(raw.contentVersion)||!obj(raw.records)||!obj(raw.chapters)||!obj(raw.test))error('Файл не соответствует поддерживаемой версии SYN Study. Исходные данные не изменены.');
+ if(!obj(raw)||raw.schemaVersion!==1||!['1.0.0','1.0.1','1.1.0',VERSION].includes(raw.contentVersion)||!obj(raw.records)||!obj(raw.chapters)||!obj(raw.test))error('Файл не соответствует поддерживаемой версии SYN Study. Исходные данные не изменены.');
  const s=fresh();
  for(const q of QUESTIONS)if(own(raw.records,q.id))s.records[q.id]=normalRecord(q,raw.records[q.id]);
  for(const {id} of CHAPTERS){
   const c=raw.chapters[id];if(!obj(c))continue;
   s.chapters[id]={stage:stages.includes(c.stage)?c.stage:'meaning',index:int(c.index,0,PRACTICE.filter(q=>q.chapter===id).length-1),visited:Array.isArray(c.visited)?[...new Set(c.visited.filter(x=>stages.includes(x)))]:[],collected:c.collected===true};
  }
- const scope=run=>{const ids=Array.isArray(run.questionIds)?[...new Set(run.questionIds.filter(id=>TEST.some(q=>q.id===id)))]:TEST.slice(0,raw.contentVersion===VERSION?TEST.length:10).map(q=>q.id);return ids.length?ids:TEST.slice(0,10).map(q=>q.id);};
+ const scope=run=>{const ids=Array.isArray(run.questionIds)?[...new Set(run.questionIds.filter(id=>TEST.some(q=>q.id===id)))]:(raw.contentVersion===VERSION?TEST:TEST.filter(q=>Number(q.id.slice(2))<=(raw.contentVersion==='1.1.0'?30:10)).sort((a,b)=>Number(a.id.slice(2))-Number(b.id.slice(2)))).map(q=>q.id);return ids.length?ids:TEST.filter(q=>Number(q.id.slice(2))<=10).sort((a,b)=>Number(a.id.slice(2))-Number(b.id.slice(2))).map(q=>q.id);};
  const d=raw.test.draft;
  if(obj(d))s.test.draft={questionIds:scope(d),seed:typeof d.seed==='string'?d.seed.slice(0,80):'legacy',answers:testAnswers(d.answers),hints:Array.isArray(d.hints)?[...new Set(d.hints.filter(id=>TEST.some(q=>q.id===id)))]:[],index:int(d.index,0,scope(d).length-1)};
  for(const run of (Array.isArray(raw.test.runs)?raw.test.runs:[]).slice(-20)){
@@ -147,6 +148,7 @@ export function normalise(raw){
   s.test.runs.push({questionIds:scope(run),seed:typeof run.seed==='string'?run.seed.slice(0,80):'legacy',answers,hints:[...new Set(hints)],completedAt:typeof run.completedAt==='string'?run.completedAt.slice(0,40):''});
  }
  s.models=normaliseModels(raw.models);
+ s.foundation=normaliseFoundation(raw.foundation);
  s.prefs.reduceMotion=raw.prefs?.reduceMotion===true;
  if(obj(raw.labs)){
   s.labs={relation:['valid','ambiguous','partial'].includes(raw.labs.relation)?raw.labs.relation:'valid',relationInput:int(raw.labs.relationInput,-1,1),preset:['wide','onto','branch'].includes(raw.labs.preset)?raw.labs.preset:'wide',input:typeof raw.labs.input==='number'&&Number.isFinite(raw.labs.input)?Math.max(-1,Math.min(3,raw.labs.input)):1,checked:raw.labs.checked===true};

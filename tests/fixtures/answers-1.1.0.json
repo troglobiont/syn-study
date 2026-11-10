@@ -1,0 +1,1450 @@
+[
+  {
+    "id": "l1-1",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "multi",
+        "answer": [
+          "0",
+          "1"
+        ],
+        "options": [
+          {
+            "id": "0",
+            "text": "2 ∈ A"
+          },
+          {
+            "id": "1",
+            "text": "{2} ⊆ A"
+          },
+          {
+            "id": "2",
+            "text": "{2} ∈ A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l1-2",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Только R"
+          },
+          {
+            "id": "1",
+            "text": "R и T"
+          },
+          {
+            "id": "2",
+            "text": "Все три"
+          },
+          {
+            "id": "3",
+            "text": "Ни одно"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l1-3",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": -7,
+        "rule": "equal"
+      },
+      {
+        "id": "b",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "2t − 1"
+          },
+          {
+            "id": "1",
+            "text": "2t − 2"
+          },
+          {
+            "id": "2",
+            "text": "2t + 1"
+          },
+          {
+            "id": "3",
+            "text": "2t − 3"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l1-4",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "I верно, II ложно"
+          },
+          {
+            "id": "1",
+            "text": "Оба верны"
+          },
+          {
+            "id": "2",
+            "text": "I ложно, II верно"
+          },
+          {
+            "id": "3",
+            "text": "Оба ложны"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l1-5",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "(r∘s)(t) = (t−1)²; (s∘r)(t) = t²−1"
+          },
+          {
+            "id": "1",
+            "text": "(r∘s)(t) = t²−1; (s∘r)(t) = (t−1)²"
+          },
+          {
+            "id": "2",
+            "text": "Обе равны t²−1"
+          }
+        ]
+      },
+      {
+        "id": "b",
+        "type": "number",
+        "answer": 1,
+        "rule": "notEqual"
+      }
+    ]
+  },
+  {
+    "id": "l2-1",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "ℝ; ℝ; [0,+∞)"
+          },
+          {
+            "id": "1",
+            "text": "ℝ; [0,+∞); [0,+∞)"
+          },
+          {
+            "id": "2",
+            "text": "[0,+∞); ℝ; ℝ"
+          }
+        ]
+      },
+      {
+        "id": "b",
+        "type": "multi",
+        "answer": [
+          "0",
+          "1"
+        ],
+        "options": [
+          {
+            "id": "0",
+            "text": "Области определения"
+          },
+          {
+            "id": "1",
+            "text": "Кодомену"
+          },
+          {
+            "id": "2",
+            "text": "Образу"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l2-2",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Сюръективна, неинъективна; двусторонней обратной нет"
+          },
+          {
+            "id": "1",
+            "text": "Биекция; обратная 1+√y"
+          },
+          {
+            "id": "2",
+            "text": "Инъективна, несюръективна"
+          },
+          {
+            "id": "3",
+            "text": "Ни инъекции, ни сюръекции"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l2-3",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "[−1,2) ∪ (2,+∞)"
+          },
+          {
+            "id": "1",
+            "text": "(−1,2) ∪ (2,+∞)"
+          },
+          {
+            "id": "2",
+            "text": "[−1,+∞)"
+          },
+          {
+            "id": "3",
+            "text": "ℝ ∖ {2}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l2-4",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "k⁻¹: [0,4] → [1,3], y ↦ 1+√y"
+          },
+          {
+            "id": "1",
+            "text": "k⁻¹: [0,4] → [1,3], y ↦ 1−√y"
+          },
+          {
+            "id": "2",
+            "text": "k⁻¹: ℝ → ℝ, y ↦ 1±√y"
+          },
+          {
+            "id": "3",
+            "text": "Обратной нет"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l2-5",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "set",
+        "answer": [
+          -1,
+          0,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "b",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "∅"
+          },
+          {
+            "id": "1",
+            "text": "{0}"
+          },
+          {
+            "id": "2",
+            "text": "{−1}"
+          },
+          {
+            "id": "3",
+            "text": "Не определено, ведь q необратима"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l3-1",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "x³+C"
+          },
+          {
+            "id": "1",
+            "text": "6x+C"
+          },
+          {
+            "id": "2",
+            "text": "x³"
+          },
+          {
+            "id": "3",
+            "text": "3x³+C"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l3-2",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 8,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l3-3",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "ln 2"
+          },
+          {
+            "id": "1",
+            "text": "2 ln 2"
+          },
+          {
+            "id": "2",
+            "text": "1/2"
+          },
+          {
+            "id": "3",
+            "text": "1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l3-4",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 1,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l3-5",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "multi",
+        "answer": [
+          "0",
+          "1"
+        ],
+        "options": [
+          {
+            "id": "0",
+            "text": "∫₁⁺∞x⁻²dx"
+          },
+          {
+            "id": "1",
+            "text": "∫₀¹x⁻¹⁄²dx"
+          },
+          {
+            "id": "2",
+            "text": "∫₁⁺∞dx/x"
+          },
+          {
+            "id": "3",
+            "text": "∫₀¹dx/x²"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l4-1",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 4,
+        "rule": "equal"
+      },
+      {
+        "id": "b",
+        "type": "number",
+        "answer": 13,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l4-2",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 2,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l4-3",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 2,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l4-4",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Строгий глобальный минимум"
+          },
+          {
+            "id": "1",
+            "text": "Строгий максимум"
+          },
+          {
+            "id": "2",
+            "text": "Седловая точка"
+          },
+          {
+            "id": "3",
+            "text": "Экстремума нет"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l4-5",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": -0.75,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l5-1",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Поточечная, но не равномерная"
+          },
+          {
+            "id": "1",
+            "text": "Равномерная к нулю"
+          },
+          {
+            "id": "2",
+            "text": "Равномерная к разрывной функции"
+          },
+          {
+            "id": "3",
+            "text": "Поточечной сходимости нет"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l5-2",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 0.25,
+        "rule": "equal"
+      },
+      {
+        "id": "b",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Равномерная к 0"
+          },
+          {
+            "id": "1",
+            "text": "Только поточечная"
+          },
+          {
+            "id": "2",
+            "text": "Не сходится"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l5-3",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 1,
+        "rule": "equal"
+      },
+      {
+        "id": "b",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "В обеих точках расходится"
+          },
+          {
+            "id": "1",
+            "text": "В обеих сходится"
+          },
+          {
+            "id": "2",
+            "text": "Сходится только в −1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l5-4",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Ряд сходится абсолютно и равномерно на ℝ"
+          },
+          {
+            "id": "1",
+            "text": "Только поточечно"
+          },
+          {
+            "id": "2",
+            "text": "Ряд расходится"
+          },
+          {
+            "id": "3",
+            "text": "Сумма обязательно дифференцируема"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l5-5",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 2,
+        "rule": "equal"
+      },
+      {
+        "id": "b",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Все равны нулю"
+          },
+          {
+            "id": "1",
+            "text": "Все равны 1"
+          },
+          {
+            "id": "2",
+            "text": "aₙ=2/n"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "l6-1",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 3,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l6-2",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "r dr dθ"
+          },
+          {
+            "id": "1",
+            "text": "dr dθ"
+          },
+          {
+            "id": "2",
+            "text": "r² dr dθ"
+          }
+        ]
+      },
+      {
+        "id": "b",
+        "type": "number",
+        "answer": 4,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l6-3",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 5,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l6-4",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 4,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "l6-5",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 2,
+        "rule": "equal"
+      },
+      {
+        "id": "b",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "меняет знак"
+          },
+          {
+            "id": "1",
+            "text": "сохраняется"
+          },
+          {
+            "id": "2",
+            "text": "становится нулём"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-1",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "multi",
+        "answer": [
+          "0",
+          "1"
+        ],
+        "options": [
+          {
+            "id": "0",
+            "text": "1 ∈ A"
+          },
+          {
+            "id": "1",
+            "text": "{3} ⊆ A"
+          },
+          {
+            "id": "2",
+            "text": "{1,3} ∈ A"
+          },
+          {
+            "id": "3",
+            "text": "4 ∈ A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-2",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Функция A→B, неинъективная"
+          },
+          {
+            "id": "1",
+            "text": "Не функция: значение 1 повторяется"
+          },
+          {
+            "id": "2",
+            "text": "Биекция A→B"
+          },
+          {
+            "id": "3",
+            "text": "Не функция: 2 не принадлежит образу"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-3",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Верно только I"
+          },
+          {
+            "id": "1",
+            "text": "Верно только II"
+          },
+          {
+            "id": "2",
+            "text": "Оба верны"
+          },
+          {
+            "id": "3",
+            "text": "Оба ложны"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-4",
+    "chapter": "one",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "3x+6 и 3x+2"
+          },
+          {
+            "id": "1",
+            "text": "3x+2 и 3x+6"
+          },
+          {
+            "id": "2",
+            "text": "Обе 3x+6"
+          },
+          {
+            "id": "3",
+            "text": "Обе 3x+2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-5",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "(−∞,−1) ∪ (−1,4]"
+          },
+          {
+            "id": "1",
+            "text": "[−1,4]"
+          },
+          {
+            "id": "2",
+            "text": "(−∞,4]"
+          },
+          {
+            "id": "3",
+            "text": "(−1,4)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-6",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "[−2,2]; ℝ; [0,4]"
+          },
+          {
+            "id": "1",
+            "text": "[−2,2]; [0,4]; [0,4]"
+          },
+          {
+            "id": "2",
+            "text": "ℝ; ℝ; [0,+∞)"
+          },
+          {
+            "id": "3",
+            "text": "[−2,2]; ℝ; [−4,4]"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-7",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "f⁻¹: [0,4]→[−2,0], y↦−√y"
+          },
+          {
+            "id": "1",
+            "text": "f⁻¹: [0,4]→[−2,0], y↦√y"
+          },
+          {
+            "id": "2",
+            "text": "f⁻¹: ℝ→ℝ, y↦±√y"
+          },
+          {
+            "id": "3",
+            "text": "Обратной нет"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-8",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "set",
+        "answer": [
+          -3,
+          3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-9",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Нет, его нужно задать отдельно"
+          },
+          {
+            "id": "1",
+            "text": "Да, это всегда [0,+∞)"
+          },
+          {
+            "id": "2",
+            "text": "Да, это всегда ℝ"
+          },
+          {
+            "id": "3",
+            "text": "Кодомен совпадает с областью определения"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-10",
+    "chapter": "two",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Инъективна, несюръективна; обратной на всём [0,5] нет"
+          },
+          {
+            "id": "1",
+            "text": "Биекция, обратная √y"
+          },
+          {
+            "id": "2",
+            "text": "Сюръективна, неинъективна"
+          },
+          {
+            "id": "3",
+            "text": "Ни инъекции, ни сюръекции"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-11",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 1,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-12",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "ln|x|+C"
+          },
+          {
+            "id": "1",
+            "text": "ln x+C"
+          },
+          {
+            "id": "2",
+            "text": "−1/x²+C"
+          },
+          {
+            "id": "3",
+            "text": "x ln x+C"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-13",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 0.5,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-14",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Расходится; главное значение 0 не меняет этого"
+          },
+          {
+            "id": "1",
+            "text": "Сходится к 0"
+          },
+          {
+            "id": "2",
+            "text": "Сходится абсолютно"
+          },
+          {
+            "id": "3",
+            "text": "Равен ln 2"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-15",
+    "chapter": "three",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "2x sin(x²)"
+          },
+          {
+            "id": "1",
+            "text": "sin(x²)"
+          },
+          {
+            "id": "2",
+            "text": "2x cos(x²)"
+          },
+          {
+            "id": "3",
+            "text": "sin(2x)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-16",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": -1,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-17",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Седловая"
+          },
+          {
+            "id": "1",
+            "text": "Строгий минимум"
+          },
+          {
+            "id": "2",
+            "text": "Строгий максимум"
+          },
+          {
+            "id": "3",
+            "text": "Недостаточно данных"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-18",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 20,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-19",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "√2"
+          },
+          {
+            "id": "1",
+            "text": "2"
+          },
+          {
+            "id": "2",
+            "text": "1"
+          },
+          {
+            "id": "3",
+            "text": "0"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-20",
+    "chapter": "four",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Частные производные существуют в окрестности a и непрерывны в a"
+          },
+          {
+            "id": "1",
+            "text": "Все частные производные существуют только в a"
+          },
+          {
+            "id": "2",
+            "text": "Пределы вдоль осей равны"
+          },
+          {
+            "id": "3",
+            "text": "f ограничена"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-21",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "Равномерная к 0"
+          },
+          {
+            "id": "1",
+            "text": "Только поточечная к 0"
+          },
+          {
+            "id": "2",
+            "text": "К 1"
+          },
+          {
+            "id": "3",
+            "text": "Сходимости нет"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-22",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "fₙ⇒f и f′=g внутри отрезка"
+          },
+          {
+            "id": "1",
+            "text": "fₙ не обязаны сходиться"
+          },
+          {
+            "id": "2",
+            "text": "f′ всегда равна нулю"
+          },
+          {
+            "id": "3",
+            "text": "Можно утверждать лишь поточечную сходимость"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-23",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 1,
+        "rule": "equal"
+      },
+      {
+        "id": "b",
+        "type": "choice",
+        "answer": "0",
+        "options": [
+          {
+            "id": "0",
+            "text": "В −1 сходится, в 1 расходится"
+          },
+          {
+            "id": "1",
+            "text": "В обеих сходится"
+          },
+          {
+            "id": "2",
+            "text": "В обеих расходится"
+          },
+          {
+            "id": "3",
+            "text": "В 1 сходится, в −1 расходится"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t-24",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 4,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-25",
+    "chapter": "five",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 1,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-26",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 1.5,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-27",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 6,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-28",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": -2,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-29",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 2,
+        "rule": "equal"
+      }
+    ]
+  },
+  {
+    "id": "t-30",
+    "chapter": "six",
+    "parts": [
+      {
+        "id": "a",
+        "type": "number",
+        "answer": 1,
+        "rule": "equal"
+      }
+    ]
+  }
+]

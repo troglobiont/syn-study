@@ -5,8 +5,8 @@ import {fresh,parseNumber,parseSet,grade,submit,event,status,stats,record,normal
 const correct=q=>Object.fromEntries(q.parts.map(p=>[p.id,p.type==='multi'?[...p.answer]:p.type==='choice'?p.answer:p.type==='set'?'{'+p.answer.join(',')+'}':p.rule==='notEqual'?'0':String(p.answer)]));
 class Memory {constructor(){this.data=new Map();this.fail=null;}getItem(k){return this.data.get(k)??null;}setItem(k,v){if(this.fail===k||this.fail==='all')throw Error('quota');this.data.set(k,String(v));}removeItem(k){this.data.delete(k);}}
 
-test('60 questions have exact checked expected answers; every distractor is rejected',()=>{
- assert.equal(PRACTICE.length,30);assert.equal(TEST.length,30);assert.equal(new Set(QUESTIONS.map(q=>q.id)).size,60);
+test('150 questions have exact checked expected answers; every distractor is rejected',()=>{
+ assert.equal(PRACTICE.length,75);assert.equal(TEST.length,75);assert.equal(new Set(QUESTIONS.map(q=>q.id)).size,150);
  for(const q of QUESTIONS){
   assert.ok(grade(q,correct(q)).correct,q.id);
   for(const p of q.parts){
@@ -127,10 +127,10 @@ test('final test grades only on finish, supports incomplete and assisted results
  const s=fresh();startTest(s);const seed=s.test.draft.seed;startTest(s);assert.equal(s.test.draft.seed,seed);
  for(const q of TEST)s.test.draft.answers[q.id]=correct(q);
  s.test.draft.hints.push('t-2');assert.equal(s.test.runs.length,0);assert.equal(finishTest(s),true);assert.equal(finishTest(s),false);
- const results=testResult(s.test.runs[0]);assert.equal(results.filter(x=>x.correct).length,30);assert.equal(results.filter(x=>x.independent).length,29);
+ const results=testResult(s.test.runs[0]);assert.equal(results.filter(x=>x.correct).length,75);assert.equal(results.filter(x=>x.independent).length,74);
  assert.equal(testResult(null).filter(x=>x.correct).length,0);
 });
-test('stable option ordering preserves IDs and cannot give 10/10 to the first-position strategy',()=>{
+test('stable option ordering preserves IDs and cannot give a perfect score to the first-position strategy',()=>{
  for(const seed of ['alpha','beta','gamma','reload-seed','0','1','2','attempt-24']){
   const raw=fresh();startTest(raw);raw.test.draft.seed=seed;
   const reloaded=normalise(raw);
@@ -146,7 +146,7 @@ test('stable option ordering preserves IDs and cannot give 10/10 to the first-po
     assert.equal(grade(q,correct(q)).correct,true);
    }
   }
-  assert.ok(testResult({answers:strategy,hints:[]}).filter(x=>x.correct).length<10);
+  assert.ok(testResult({answers:strategy,hints:[]}).filter(x=>x.correct).length<TEST.length);
   const positions=TEST.filter(q=>q.parts[0].type==='choice').map(q=>orderedOptions(q,q.parts[0],seed).findIndex(o=>o.id===q.parts[0].answer));
   assert.ok(new Set(positions).size>1);
  }
