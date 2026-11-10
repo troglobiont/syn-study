@@ -250,4 +250,14 @@ const requirements={
  's-fourier-1':[['fourier','Коэффициенты и ядро Дирихле']],
  's-fourier-2':[['fourier','Преобразование Фурье']]
 };
-for(const q of SEMINAR_QUESTIONS)q.prerequisites=requirements[q.id].map(([chapter,topic])=>({chapter,topic}));
+const seminarMatches={
+ 's-sequences-1':'b1-7','s-sequences-2':'b1-9',
+ 's-limits-2':'b1-14','s-derivatives-2':'b1-20',
+ 's-numeric-2':'b2-2','s-improper-2':'b2-15',
+ 's-space-1':'b2-20','s-space-2':'b2-21',
+ 's-continuity-2':'n3-1.1','s-higher-1':'n3-1.1'
+};
+for(const q of SEMINAR_QUESTIONS){
+ q.prerequisites=requirements[q.id].map(([chapter,topic])=>({chapter,topic}));
+ if(seminarMatches[q.id])q.seminarId=seminarMatches[q.id];
+}
