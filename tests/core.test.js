@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PRACTICE,TEST,QUESTIONS,BY_ID} from '../dist/content.js';
+import {VERSION,PRACTICE,TEST,QUESTIONS,BY_ID} from '../dist/content.js';
 import {fresh,parseNumber,parseSet,grade,submit,event,status,stats,record,normalise,exportText,importText,Store,MAIN_KEY,SANDBOX_KEY,MODE_KEY,startTest,finishTest,testResult,orderedOptions,reviewIds} from '../dist/core.js';
 const correct=q=>Object.fromEntries(q.parts.map(p=>[p.id,p.type==='multi'?[...p.answer]:p.type==='choice'?p.answer:p.type==='set'?'{'+p.answer.join(',')+'}':p.rule==='notEqual'?'0':String(p.answer)]));
 class Memory {constructor(){this.data=new Map();this.fail=null;}getItem(k){return this.data.get(k)??null;}setItem(k,v){if(this.fail===k||this.fail==='all')throw Error('quota');this.data.set(k,String(v));}removeItem(k){this.data.delete(k);}}
@@ -70,6 +70,23 @@ test('export/import round trip preserves drafts, first attempt, assistance, lab 
  const s=fresh();event(s,'l2-5','hint');submit(s,'l2-5',correct(BY_ID['l2-5']));s.labs.preset='branch';s.labs.input=2.25;
  s.chapters.one.stage='lab';s.chapters.one.collected=true;startTest(s);s.test.draft.answers['t-8']={a:'{-3,3}'};
  assert.deepEqual(importText(exportText(s)),normalise(s));
+});
+test('1.0.0 saved progress and exports upgrade without losing attempts, help, drafts or sandbox isolation',()=>{
+ const legacy=fresh();legacy.contentVersion='1.0.0';
+ submit(legacy,'l1-3',{a:'0',b:'0'});submit(legacy,'l1-3',correct(BY_ID['l1-3']));
+ event(legacy,'l2-5','hint');submit(legacy,'l2-5',correct(BY_ID['l2-5']));
+ legacy.chapters.one.collected=true;legacy.chapters.two.stage='lab';legacy.labs.preset='branch';
+ startTest(legacy);legacy.test.draft.answers['t-8']={a:'{-3,3}'};finishTest(legacy);
+ startTest(legacy);legacy.test.draft.answers['t-1']={a:['0']};
+ const before=stats(legacy),text=JSON.stringify(legacy),m=new Memory();m.setItem(MAIN_KEY,text);
+ const store=new Store(m);assert.equal(store.blocked,false);assert.equal(store.state.contentVersion,VERSION);
+ assert.deepEqual(stats(store.state),before);assert.equal(store.state.records['l1-3'].events[0].answer.a,'0');
+ assert.deepEqual(store.state.test,legacy.test);assert.equal(store.state.chapters.one.collected,true);
+ assert.equal(store.state.labs.preset,'branch');
+ assert.deepEqual(importText(JSON.stringify({application:'SYN Study',exportVersion:1,state:legacy})),store.state);
+ store.save();assert.equal(JSON.parse(m.getItem(MAIN_KEY)).contentVersion,VERSION);
+ const upgraded=m.getItem(MAIN_KEY);store.begin();store.end();assert.equal(m.getItem(MAIN_KEY),upgraded);
+ assert.throws(()=>normalise({...legacy,contentVersion:'0.9.0'}));
 });
 test('unknown fields and injected IDs are removed; grades are recomputed',()=>{
  const s=fresh();s.evil='<script>';s.records['__proto__']={solved:true};s.records['not-a-question']={solved:true};

@@ -127,7 +127,8 @@ function testAnswers(raw){
  return answers;
 }
 export function normalise(raw){
- if(!obj(raw)||raw.schemaVersion!==1||raw.contentVersion!==VERSION||!obj(raw.records)||!obj(raw.chapters)||!obj(raw.test))error('Файл не соответствует SYN Study 1.0. Исходные данные не изменены.');
+ // 1.0.1 revises wording only: question, part and option IDs and answer keys are unchanged.
+ if(!obj(raw)||raw.schemaVersion!==1||!['1.0.0',VERSION].includes(raw.contentVersion)||!obj(raw.records)||!obj(raw.chapters)||!obj(raw.test))error('Файл не соответствует поддерживаемой версии SYN Study. Исходные данные не изменены.');
  const s=fresh();
  for(const q of QUESTIONS)if(own(raw.records,q.id))s.records[q.id]=normalRecord(q,raw.records[q.id]);
  for(const id of ['one','two']){

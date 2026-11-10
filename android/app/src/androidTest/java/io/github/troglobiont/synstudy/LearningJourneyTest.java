@@ -76,14 +76,14 @@ public final class LearningJourneyTest {
             submitPractice(id);nextPractice(i==5);
         }
         click("[data-action='collect']");
-        await("document.querySelector('[data-action=collect]').textContent.includes('в вашем атласе')");
+        await("document.querySelector('[data-action=collect]').textContent.includes('Итоги сохранены')");
     }
     @Test public void completeOfflineJourneyAndNativeFiles() throws Exception {
         scenario=ActivityScenario.launch(MainActivity.class);
         try {
             await("document.querySelector('.brand')!==null");
             UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-            assertTrue("Rendered home",device.findObject(new UiSelector().textContains("Знакомое")).waitForExists(30000));
+            assertTrue("Rendered home",device.findObject(new UiSelector().textContains("Множества")).waitForExists(30000));
             device.waitForIdle();
             device.executeShellCommand("screencap -p /sdcard/Download/SYN-Study-home.png");
             assertEquals(PackageManager.PERMISSION_DENIED,
