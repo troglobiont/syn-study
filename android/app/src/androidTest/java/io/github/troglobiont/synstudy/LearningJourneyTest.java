@@ -65,13 +65,28 @@ public final class LearningJourneyTest {
     private void allCorrectPractice(String chapter) throws Exception {
         route("#lesson/"+chapter+"/practice");
         for(int i=1;i<=5;i++) {
-            String id="l"+(chapter.equals("one")?"1":"2")+"-"+i;
+            int chapterNumber=java.util.Arrays.asList("one","two","three","four","five","six").indexOf(chapter)+1;
+            String id="l"+chapterNumber+"-"+i;
             await("document.querySelector('#answer-form')?.dataset.question==="+JSONObject.quote(id));
             if(id.equals("l1-1")) { choose("a","0");choose("a","1"); }
             else if(id.equals("l1-3")) { type("a","-7,0");choose("b","0"); }
             else if(id.equals("l1-5")) { choose("a","0");type("b","0/2"); }
             else if(id.equals("l2-1")) { choose("a","0");choose("b","0");choose("b","1"); }
             else if(id.equals("l2-5")) { type("a","{3;2;0;-1}");choose("b","0"); }
+            else if(id.equals("l3-2"))type("a","8");
+            else if(id.equals("l3-4"))type("a","1");
+            else if(id.equals("l3-5")){choose("a","0");choose("a","1");}
+            else if(id.equals("l4-1")){type("a","4");type("b","13");}
+            else if(id.equals("l4-2")||id.equals("l4-3"))type("a","2");
+            else if(id.equals("l4-5"))type("a","-3/4");
+            else if(id.equals("l5-2")){type("a","1/4");choose("b","0");}
+            else if(id.equals("l5-3")){type("a","1");choose("b","0");}
+            else if(id.equals("l5-5")){type("a","2");choose("b","0");}
+            else if(id.equals("l6-1"))type("a","3");
+            else if(id.equals("l6-2")){choose("a","0");type("b","4");}
+            else if(id.equals("l6-3"))type("a","5");
+            else if(id.equals("l6-4"))type("a","4");
+            else if(id.equals("l6-5")){type("a","2");choose("b","0");}
             else choose("a","0");
             submitPractice(id);nextPractice(i==5);
         }
@@ -83,7 +98,7 @@ public final class LearningJourneyTest {
         try {
             await("document.querySelector('.brand')!==null");
             UiDevice device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-            assertTrue("Rendered home",device.findObject(new UiSelector().textContains("Множества")).waitForExists(30000));
+            assertTrue("Rendered home",device.findObject(new UiSelector().textContains("Математический")).waitForExists(30000));
             device.waitForIdle();
             device.executeShellCommand("screencap -p /sdcard/Download/SYN-Study-home.png");
             assertEquals(PackageManager.PERMISSION_DENIED,
@@ -102,13 +117,20 @@ public final class LearningJourneyTest {
             click("[data-action='hint']");click("[data-action='reveal']");
             choose("a","2"); // uncheck the wrong option
             allCorrectPractice("one");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('4 / 10 с первой')"));
+            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('4 / 30 с первой')"));
 
             route("#lesson/two/lab");
             js("var p=document.querySelector('#map-preset');p.value='branch';p.dispatchEvent(new Event('change',{bubbles:true}))");
             await("document.querySelector('.lab-conclusion').textContent.includes('Биекция')");
             allCorrectPractice("two");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('9 / 10 с первой')"));
+            for(String chapter:new String[]{"three","four","five","six"}) {
+                route("#lesson/"+chapter+"/lab");
+                await("!!document.querySelector('#advanced-model-output svg')");
+                js("var c=document.querySelector('[data-model-field]');c.value=c.max;c.dispatchEvent(new Event('input',{bubbles:true}))");
+                assertEquals(Boolean.TRUE,js("document.documentElement.scrollWidth<=innerWidth"));
+                allCorrectPractice(chapter);
+            }
+            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('29 / 30 с первой')"));
 
             scenario.recreate();
             await("!!document.querySelector('.insight-sheet')");
@@ -120,20 +142,30 @@ public final class LearningJourneyTest {
             scenario.recreate();await("!!document.querySelector('.sandbox-banner')");
             click("[data-action='end-sandbox']");
             await("!document.querySelector('.sandbox-banner')");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('9 / 10 с первой')"));
+            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('29 / 30 с первой')"));
 
             route("#test");click("[data-action='start-test']");
-            for(int i=1;i<=10;i++) {
+            for(int i=1;i<=30;i++) {
                 await("document.querySelector('#answer-form')?.dataset.question==='t-"+i+"'");
                 if(i==1){choose("a","0");choose("a","1");}
                 else if(i==8)type("a","{3,-3}");
+                else if(i==11||i==25||i==30)type("a","1");
+                else if(i==13)type("a","1/2");
+                else if(i==16)type("a","-1");
+                else if(i==18)type("a","20");
+                else if(i==23){type("a","1");choose("b","0");}
+                else if(i==24)type("a","4");
+                else if(i==26)type("a","3/2");
+                else if(i==27)type("a","6");
+                else if(i==28)type("a","-2");
+                else if(i==29)type("a","2");
                 else choose("a","0");
                 js("document.querySelector('#answer-form').requestSubmit()");
             }
             await("location.hash==='#test/overview'");
             click("[data-action='finish-test']");
             await("!!document.querySelector('.test-score')");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='10 / 10'"));
+            assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='30 / 30'"));
 
             // Real Android document picker: export, reset, import the same JSON.
             route("#data");
@@ -145,7 +177,7 @@ public final class LearningJourneyTest {
             assertTrue("Save button",save.waitForExists(30000));save.click();
             await("document.querySelector('#toast').textContent==='Файл сохранён.'");
             click("[data-action='ask-reset']");click("[data-action='confirm-reset']");
-            await("document.querySelector('.footer').textContent.includes('0 / 10 с первой')");
+            await("document.querySelector('.footer').textContent.includes('0 / 30 с первой')");
             js("document.querySelector('.file-label').scrollIntoView({block:'center'})");
             UiObject importControl=device.findObject(new UiSelector().text("Выбрать файл импорта"));
             assertTrue("Native import control",importControl.waitForExists(5000));importControl.click();
@@ -159,9 +191,9 @@ public final class LearningJourneyTest {
             assertTrue("Exported JSON visible in picker",exported.waitForExists(10000));exported.click();
             await("!!document.querySelector('.import-preview')");
             click("[data-action='confirm-import']");
-            await("document.querySelector('.footer').textContent.includes('9 / 10 с первой')");
+            await("document.querySelector('.footer').textContent.includes('29 / 30 с первой')");
             route("#results");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='10 / 10'"));
+            assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='30 / 30'"));
 
             click("[data-action='glossary']");await("!!document.querySelector('dialog[open]')");
             device.pressBack();await("!document.querySelector('dialog[open]')");
