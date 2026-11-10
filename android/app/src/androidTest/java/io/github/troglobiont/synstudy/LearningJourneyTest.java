@@ -65,7 +65,7 @@ public final class LearningJourneyTest {
     private void allCorrectPractice(String chapter) throws Exception {
         route("#lesson/"+chapter+"/practice");
         for(int i=1;i<=5;i++) {
-            int chapterNumber=java.util.Arrays.asList("one","two","three","four","five","six","real","sequences","limits","derivatives","numeric","indefinite","improper","space","continuity").indexOf(chapter)+1;
+            int chapterNumber=java.util.Arrays.asList("one","two","three","four","five","six","real","sequences","limits","derivatives","numeric","indefinite","improper","space","continuity","higher","smooth","measure","lebesgue","multiple","parameters","uniformintegrals","approximation","surface","forms","fourier").indexOf(chapter)+1;
             String id="l"+chapterNumber+"-"+i;
             await("document.querySelector('#answer-form')?.dataset.question==="+JSONObject.quote(id));
             if(id.equals("l1-1")) { choose("a","0");choose("a","1"); }
@@ -87,12 +87,59 @@ public final class LearningJourneyTest {
             else if(id.equals("l6-3"))type("a","5");
             else if(id.equals("l6-4"))type("a","4");
             else if(id.equals("l6-5")){type("a","2");choose("b","0");}
+            else if(chapterNumber>=16)yearTwoPractice(id);
             else if(chapterNumber>=7)foundationPractice(id);
             else choose("a","0");
             submitPractice(id);nextPractice(i==5);
         }
         click("[data-action='collect']");
         await("document.querySelector('[data-action=collect]').textContent.includes('Итоги сохранены')");
+    }
+    private void yearTwoPractice(String id) throws Exception {
+        switch(id) {
+            case "l16-1":type("a","6");break;
+            case "l16-2":type("a","3");break;
+            case "l16-5":type("a","0");break;
+            case "l17-1":type("a","3");break;
+            case "l18-1":type("a","0");break;
+            case "l18-2":type("a","4");break;
+            case "l19-1":type("a","1");break;
+            case "l19-4":type("a","0");break;
+            case "l20-1":type("a","1/2");break;
+            case "l21-1":type("a","24");break;
+            case "l21-2":type("a","1/12");break;
+            case "l21-3":type("a","-1/4");break;
+            case "l23-1":type("a","6");break;
+            case "l23-2":type("a","1");break;
+            case "l24-1":type("a","3");break;
+            case "l24-2":type("a","5");break;
+            case "l24-5":type("a","1");break;
+            case "l25-1":type("a","-1");break;
+            case "l26-1":type("a","1/2");break;
+            case "l26-5":type("a","3");break;
+            default:choose("a","0");
+        }
+    }
+    private void yearTwoTest(int i) throws Exception {
+        switch(i) {
+            case 76:type("a","20");break;
+            case 79:type("a","-1");break;
+            case 81:type("a","3");break;
+            case 86:type("a","0");break;
+            case 87:type("a","3");break;
+            case 91:type("a","0");break;
+            case 96:type("a","6");break;
+            case 101:type("a","6");break;
+            case 102:type("a","1/2");break;
+            case 103:type("a","-1");break;
+            case 111:type("a","4");break;
+            case 116:type("a","6");break;
+            case 117:type("a","2");break;
+            case 121:type("a","0");break;
+            case 122:type("a","0");break;
+            case 126:type("a","1");break;
+            default:choose("a","0");
+        }
     }
     private void foundationPractice(String id) throws Exception {
         switch(id) {
@@ -178,7 +225,7 @@ public final class LearningJourneyTest {
             click("[data-action='hint']");click("[data-action='reveal']");
             choose("a","2"); // uncheck the wrong option
             allCorrectPractice("one");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('4 / 75 с первой')"));
+            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('4 / 130 с первой')"));
 
             route("#lesson/two/lab");
             js("var p=document.querySelector('#map-preset');p.value='branch';p.dispatchEvent(new Event('change',{bubbles:true}))");
@@ -201,7 +248,17 @@ public final class LearningJourneyTest {
                 assertEquals(Boolean.TRUE,js("document.documentElement.scrollWidth<=innerWidth"));
                 allCorrectPractice(chapter);
             }
-            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('74 / 75 с первой')"));
+            for(String chapter:new String[]{"higher","smooth","measure","lebesgue","multiple","parameters","uniformintegrals","approximation","surface","forms","fourier"}) {
+                route("#lesson/"+chapter+"/lab");
+                await("document.querySelectorAll('.worked-example').length===3");
+                if(Boolean.TRUE.equals(js("!!document.querySelector('[data-year-field]')"))) {
+                    js("var c=document.querySelector('[data-year-field]');if(c.type==='range'){c.value=c.max}else{c.selectedIndex=c.options.length-1};c.dispatchEvent(new Event('input',{bubbles:true}))");
+                    await("!!document.querySelector('#year-two-output .lab-conclusion')");
+                }
+                assertEquals(Boolean.TRUE,js("document.documentElement.scrollWidth<=innerWidth"));
+                allCorrectPractice(chapter);
+            }
+            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('129 / 130 с первой')"));
 
             scenario.recreate();
             await("!!document.querySelector('.insight-sheet')");
@@ -213,10 +270,10 @@ public final class LearningJourneyTest {
             scenario.recreate();await("!!document.querySelector('.sandbox-banner')");
             click("[data-action='end-sandbox']");
             await("!document.querySelector('.sandbox-banner')");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('74 / 75 с первой')"));
+            assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('129 / 130 с первой')"));
 
             route("#test");click("[data-action='start-test']");
-            for(int i:new int[]{1,2,3,4,5,6,7,8,9,10,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,11,12,13,14,15,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30}) {
+            for(int i:new int[]{1,2,3,4,5,6,7,8,9,10,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,11,12,13,14,15,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,16,17,18,19,20,21,22,23,24,25,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,26,27,28,29,30,126,127,128,129,130}) {
                 await("document.querySelector('#answer-form')?.dataset.question==='t-"+i+"'");
                 if(i==1){choose("a","0");choose("a","1");}
                 else if(i==8)type("a","{3,-3}");
@@ -230,6 +287,7 @@ public final class LearningJourneyTest {
                 else if(i==27)type("a","6");
                 else if(i==28)type("a","-2");
                 else if(i==29)type("a","2");
+                else if(i>=76)yearTwoTest(i);
                 else if(i>=31)foundationTest(i);
                 else choose("a","0");
                 js("document.querySelector('#answer-form').requestSubmit()");
@@ -237,7 +295,7 @@ public final class LearningJourneyTest {
             await("location.hash==='#test/overview'");
             click("[data-action='finish-test']");
             await("!!document.querySelector('.test-score')");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='75 / 75'"));
+            assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='130 / 130'"));
 
             // Real Android document picker: export, reset, import the same JSON.
             route("#data");
@@ -249,7 +307,7 @@ public final class LearningJourneyTest {
             assertTrue("Save button",save.waitForExists(30000));save.click();
             await("document.querySelector('#toast').textContent==='Файл сохранён.'");
             click("[data-action='ask-reset']");click("[data-action='confirm-reset']");
-            await("document.querySelector('.footer').textContent.includes('0 / 75 с первой')");
+            await("document.querySelector('.footer').textContent.includes('0 / 130 с первой')");
             js("document.querySelector('.file-label').scrollIntoView({block:'center'})");
             UiObject importControl=device.findObject(new UiSelector().text("Выбрать файл импорта"));
             assertTrue("Native import control",importControl.waitForExists(5000));importControl.click();
@@ -263,9 +321,9 @@ public final class LearningJourneyTest {
             assertTrue("Exported JSON visible in picker",exported.waitForExists(10000));exported.click();
             await("!!document.querySelector('.import-preview')");
             click("[data-action='confirm-import']");
-            await("document.querySelector('.footer').textContent.includes('74 / 75 с первой')");
+            await("document.querySelector('.footer').textContent.includes('129 / 130 с первой')");
             route("#results");
-            assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='75 / 75'"));
+            assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='130 / 130'"));
 
             click("[data-action='glossary']");await("!!document.querySelector('dialog[open]')");
             device.pressBack();await("!document.querySelector('dialog[open]')");

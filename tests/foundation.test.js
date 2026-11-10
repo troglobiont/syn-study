@@ -5,10 +5,10 @@ import {CHAPTERS,PRACTICE,TEST,BY_ID,VERSION} from '../dist/content.js';
 import {SYLLABUS} from '../dist/syllabus.js';
 import {fresh,normalise,exportText,importText,startTest,finishTest,testResult,grade} from '../dist/core.js';
 import {normaliseFoundation,foundationOutput} from '../dist/foundation-models.js';
-test('all eleven syllabus sections occur in order, with two explicitly separate extensions',()=>{
- assert.deepEqual(SYLLABUS.map(s=>s.id),['I','II','III','IV','V','VI','VII','VIII','IX','X','XI']);
+test('first-year syllabus and second-year sections form four ordered semesters',()=>{
+ assert.deepEqual(SYLLABUS.slice(0,11).map(s=>s.id),['I','II','III','IV','V','VI','VII','VIII','IX','X','XI']);
  assert.deepEqual(CHAPTERS.filter(c=>c.program).map(c=>c.id),SYLLABUS.flatMap(s=>s.chapters));
- assert.deepEqual(CHAPTERS.filter(c=>!c.program).map(c=>c.id),['five','six']);
+ assert.equal(CHAPTERS.filter(c=>!c.program).length,0);assert.equal(CHAPTERS.filter(c=>c.semester===3).length,7);assert.equal(CHAPTERS.filter(c=>c.semester===4).length,6);
  assert.equal(CHAPTERS.filter(c=>c.semester===1).length,6);assert.equal(CHAPTERS.filter(c=>c.semester===2).length,7);
  for(const c of CHAPTERS)assert.equal(PRACTICE.filter(q=>q.chapter===c.id).length,5);
  const ranks=TEST.map(q=>CHAPTERS.findIndex(c=>c.id===q.chapter));assert.deepEqual(ranks,[...ranks].sort((a,b)=>a-b));
@@ -20,10 +20,10 @@ test('all sixty legacy question identities, options and answer keys survive the 
 test('1.1.0 history and drafts retain thirty IDs even when old scope metadata is missing',()=>{
  const old=fresh();old.contentVersion='1.1.0';old.chapters={one:old.chapters.one,two:old.chapters.two,three:old.chapters.three,four:old.chapters.four,five:old.chapters.five,six:old.chapters.six};
  old.test={draft:{seed:'old30',index:29,answers:{'t-30':{a:'1'}},hints:[]},runs:[{seed:'complete30',answers:{'t-30':{a:'1'}},hints:[],completedAt:''}]};
- const n=normalise(old);assert.equal(n.contentVersion,VERSION);assert.equal(Object.keys(n.chapters).length,15);
+ const n=normalise(old);assert.equal(n.contentVersion,VERSION);assert.equal(Object.keys(n.chapters).length,26);
  assert.deepEqual(n.test.draft.questionIds,Array.from({length:30},(_,i)=>'t-'+(i+1)));assert.equal(n.test.draft.index,29);
  assert.equal(testResult(n.test.runs[0]).length,30);finishTest(n);assert.equal(testResult(n.test.runs.at(-1)).length,30);
- const again=importText(exportText(n));assert.deepEqual(again,n);startTest(again);assert.equal(again.test.draft.questionIds.length,75);
+ const again=importText(exportText(n));assert.deepEqual(again,n);startTest(again);assert.equal(again.test.draft.questionIds.length,130);
 });
 test('epsilon-N and epsilon-delta choices satisfy strict inequalities including threshold failures',()=>{
  for(const eps of [.5,.2,.1,.05,.01]){const N=Math.floor(Number((1/eps).toFixed(8)));for(let n=N+1;n<N+100;n++)assert.ok(1/n<eps);assert.ok(1/N>=eps);}
