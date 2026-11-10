@@ -190,6 +190,62 @@ public final class LearningJourneyTest {
             default:choose("a","0");
         }
     }
+    private void exploreSeminarsAndProofs(UiDevice device) throws Exception {
+        route("#task/s-sequences-1");
+        await("document.querySelector('#answer-form')?.dataset.question==='s-sequences-1'");
+        type("a","3/2");
+        click("[data-action='guide'][data-panel='knowledge']");
+        await("!!document.querySelector('.knowledge-list a')");
+        click(".knowledge-list a");
+        await("location.hash.includes('/meaning/topic-')");
+        await("document.activeElement?.id?.startsWith('topic-')");
+        click("[data-return-question='s-sequences-1']");
+        await("document.querySelector('#field-a')?.value==='3/2'");
+        click("[data-action='guide'][data-panel='example']");
+        await("document.querySelectorAll('.help-section .step-reason').length>=3");
+        click("[data-action='guide'][data-panel='solution']");
+        await("document.querySelectorAll('.solution-panel .step-reason').length===4");
+        // Reading is possible before any answer is submitted and creates no success.
+        assertEquals(Boolean.TRUE,js("!document.querySelector('.feedback.success')"));
+        submitPractice("s-sequences-1");
+        click("[data-action='pin']");
+        scenario.recreate();
+        await("document.querySelector('#field-a')?.value==='3/2'");
+        assertEquals(Boolean.TRUE,js("!!document.querySelector('.solution-panel')"));
+        route("#review");
+        assertEquals(Boolean.TRUE,js("document.body.textContent.includes('Сопряжённое выражение')"));
+
+        route("#proof/bolzano-weierstrass");
+        await("document.querySelectorAll('.proof-reader .step-reason').length===1");
+        click("[data-action='proof-next']");
+        await("document.querySelectorAll('.proof-reader .step-reason').length===2");
+        scenario.recreate();
+        await("document.querySelectorAll('.proof-reader .step-reason').length===2");
+        click("[data-action='proof-all']");
+        await("document.querySelectorAll('.proof-reader .step-reason').length===7");
+        device.executeShellCommand("screencap -p /sdcard/Download/SYN-Study-proof.png");
+        route("#lesson/sequences/meaning/topic-8");
+        await("document.activeElement?.id==='topic-8'");
+        assertEquals(Boolean.TRUE,js("!!document.querySelector('#topic-8 a[href=\"#proof/bolzano-weierstrass\"]')"));
+
+        for(String chapter:new String[]{"one","two","real","sequences","limits","derivatives","numeric","indefinite","three","improper","space","continuity","four","five","higher","smooth","measure","lebesgue","multiple","parameters","uniformintegrals","approximation","surface","forms","six","fourier"}) {
+            for(int n=1;n<=2;n++) {
+                String id="s-"+chapter+"-"+n;
+                route("#task/"+id);
+                await("document.querySelector('#answer-form')?.dataset.question==="+JSONObject.quote(id));
+                if(!Boolean.TRUE.equals(js("!!document.querySelector('.solution-panel')")))click("[data-action='guide'][data-panel='solution']");
+                await("document.querySelectorAll('.solution-panel .step-reason').length>=4");
+                assertEquals(Boolean.TRUE,js("document.documentElement.scrollWidth<=innerWidth"));
+            }
+        }
+        route("#seminars");
+        js("document.querySelector('.seminar-plan').open=true");
+        click("[data-action='semester'][data-value='4']");
+        await("document.querySelector('.semester-filter [aria-pressed=true]').textContent==='Семестр 4'");
+        js("var s=document.querySelector('#seminar-search');s.value='Фурье';document.querySelector('#seminar-filter').requestSubmit()");
+        await("document.querySelectorAll('#seminar-results .seminar-card').length===2");
+        assertEquals(Boolean.TRUE,js("document.querySelector('#seminar-results').textContent.includes('2937')"));
+    }
     @Test public void completeOfflineJourneyAndNativeFiles() throws Exception {
         scenario=ActivityScenario.launch(MainActivity.class);
         try {
@@ -222,7 +278,7 @@ public final class LearningJourneyTest {
             await("document.querySelector('#form-message').textContent.includes('Заполните')");
             choose("a","2");js("document.querySelector('#answer-form').requestSubmit()");
             await("!!document.querySelector('.feedback.neutral')");
-            click("[data-action='hint']");click("[data-action='reveal']");
+            click("[data-action='guide'][data-panel='hint']");click("[data-action='guide'][data-panel='solution']");
             choose("a","2"); // uncheck the wrong option
             allCorrectPractice("one");
             assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('4 / 130 с первой')"));
@@ -271,6 +327,8 @@ public final class LearningJourneyTest {
             click("[data-action='end-sandbox']");
             await("!document.querySelector('.sandbox-banner')");
             assertEquals(Boolean.TRUE,js("document.querySelector('.footer').textContent.includes('129 / 130 с первой')"));
+
+            exploreSeminarsAndProofs(device);
 
             route("#test");click("[data-action='start-test']");
             for(int i:new int[]{1,2,3,4,5,6,7,8,9,10,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,11,12,13,14,15,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,16,17,18,19,20,21,22,23,24,25,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,26,27,28,29,30,126,127,128,129,130}) {
@@ -322,6 +380,11 @@ public final class LearningJourneyTest {
             await("!!document.querySelector('.import-preview')");
             click("[data-action='confirm-import']");
             await("document.querySelector('.footer').textContent.includes('129 / 130 с первой')");
+            route("#task/s-sequences-1");
+            await("document.querySelector('#field-a')?.value==='3/2'");
+            assertEquals(Boolean.TRUE,js("!!document.querySelector('.solution-panel')"));
+            route("#proof/bolzano-weierstrass");
+            await("document.querySelectorAll('.proof-reader .step-reason').length===7");
             route("#results");
             assertEquals(Boolean.TRUE,js("document.querySelector('.test-score strong').textContent==='130 / 130'"));
 

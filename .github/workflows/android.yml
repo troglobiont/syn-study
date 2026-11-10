@@ -53,7 +53,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            gradle -p android --no-daemon connectedDebugAndroidTest; result=$?; adb pull /sdcard/Download/SYN-Study-last.png native-artifact/Android_Last.png; adb pull /sdcard/Download/SYN-Study-home.png native-artifact/Android_Home.png; capture=$?; if [ "$result" -ne 0 ]; then exit "$result"; fi; exit "$capture"
+            gradle -p android --no-daemon connectedDebugAndroidTest; result=$?; adb pull /sdcard/Download/SYN-Study-last.png native-artifact/Android_Last.png; adb pull /sdcard/Download/SYN-Study-home.png native-artifact/Android_Home.png; adb pull /sdcard/Download/SYN-Study-proof.png native-artifact/Android_Proof.png; capture=$?; if [ "$result" -ne 0 ]; then exit "$result"; fi; exit "$capture"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -63,4 +63,5 @@ jobs:
             android/app/build/outputs/androidTest-results/
             native-artifact/Android_Home.png
             native-artifact/Android_Last.png
+            native-artifact/Android_Proof.png
           retention-days: 14

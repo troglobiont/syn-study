@@ -1,7 +1,8 @@
-import {VERSION,BY_ID,PRACTICE,TEST,QUESTIONS,CHAPTERS} from './content.js';
+import {VERSION,BY_ID,PRACTICE,TEST,ALL_QUESTIONS as QUESTIONS,CHAPTERS,SEMINAR_QUESTIONS} from './content.js';
 import {normaliseModels} from './models.js';
 import {normaliseFoundation} from './foundation-models.js';
 import {normaliseYearTwo} from './year-two-models.js';
+import {PROOF_BY_ID} from './proofs.js';
 export const MAIN_KEY='syn-study:progress:v1';
 export const SANDBOX_KEY='syn-study:sandbox:v1';
 export const MODE_KEY='syn-study:mode:v1';
@@ -9,10 +10,10 @@ const clone = x=>JSON.parse(JSON.stringify(x));
 const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
 const obj=x=>!!x && typeof x==='object' && !Array.isArray(x);
 const stages=['meaning','lab','practice','insight'];
-const pages=['home','lesson','test','results','review','data'];
+const pages=['home','lesson','test','results','review','data','task','proof'];
 const error = message=>{throw new Error(message);};
 export function fresh(){
- return {schemaVersion:1,contentVersion:VERSION,records:{},chapters:Object.fromEntries(CHAPTERS.map(c=>[c.id,{stage:'meaning',index:0,visited:[],collected:false}])),models:normaliseModels(),foundation:normaliseFoundation(),yearTwo:normaliseYearTwo(),labs:{relation:'valid',relationInput:0,preset:'wide',input:1,checked:false},test:{draft:null,runs:[]},prefs:{reduceMotion:false},resume:{page:'home',chapter:'one'}};
+ return {schemaVersion:1,contentVersion:VERSION,study:{panels:{},proofSteps:{},returnTo:null,semester:1,query:''},records:{},chapters:Object.fromEntries(CHAPTERS.map(c=>[c.id,{stage:'meaning',index:0,visited:[],collected:false}])),models:normaliseModels(),foundation:normaliseFoundation(),yearTwo:normaliseYearTwo(),labs:{relation:'valid',relationInput:0,preset:'wide',input:1,checked:false},test:{draft:null,runs:[]},prefs:{reduceMotion:false},resume:{page:'home',chapter:'one'}};
 }
 export function parseNumber(raw){
  if(typeof raw!=='string'||raw.length>80)return null;
@@ -69,7 +70,7 @@ export function orderedOptions(q,part,seed='practice'){
  let hash=2166136261;
  for(const ch of seed)hash=Math.imul(hash^ch.charCodeAt(0),16777619)>>>0;
  const match=/^l(\d+)-(\d+)$/.exec(q.id);
- const index=match?(Number(match[1])-1)*5+Number(match[2])-1:10+Number(q.id.slice(2))-1;
+ const index=match?(Number(match[1])-1)*5+Number(match[2])-1:q.id.startsWith('t-')?10+Number(q.id.slice(2))-1:[...q.id].reduce((h,c)=>Math.imul(h^c.charCodeAt(0),16777619)>>>0,2166136261);
  const shift=(hash+index+q.parts.indexOf(part))%part.options.length;
  const base=[...part.options];
  return base.slice(shift).concat(base.slice(0,shift));
@@ -92,7 +93,7 @@ export function status(rec,q){
  }
  const solved=!!last?.correct;
  const independent=!!first?.correct&&!first.assisted;
- const label=solved?(independent?'С первой попытки':last.assisted?'С помощью':'Исправлено'):revealed?'Ответ просмотрен':last?'Есть ошибка':skipped?'Отложено':'Ещё не решено';
+ const label=solved?(independent?'С первой попытки':last.assisted?'С помощью':'Исправлено'):revealed?'Решение просмотрено':last?'Есть ошибка':skipped?'Отложено':'Ещё не решено';
  return {first,last,helped,revealed,skipped,solved,independent,label,pinned:!!r.pinned};
 }
 export function submit(state,id,answer){
@@ -132,7 +133,7 @@ function testAnswers(raw){
 }
 export function normalise(raw){
  // Existing question identities, answers and test scopes survive additive course updates.
- if(!obj(raw)||raw.schemaVersion!==1||!['1.0.0','1.0.1','1.1.0','1.2.0',VERSION].includes(raw.contentVersion)||!obj(raw.records)||!obj(raw.chapters)||!obj(raw.test))error('Файл не соответствует поддерживаемой версии SYN Study. Исходные данные не изменены.');
+ if(!obj(raw)||raw.schemaVersion!==1||!['1.0.0','1.0.1','1.1.0','1.2.0','1.3.0',VERSION].includes(raw.contentVersion)||!obj(raw.records)||!obj(raw.chapters)||!obj(raw.test))error('Файл не соответствует поддерживаемой версии SYN Study. Исходные данные не изменены.');
  const s=fresh();
  for(const q of QUESTIONS)if(own(raw.records,q.id))s.records[q.id]=normalRecord(q,raw.records[q.id]);
  for(const {id} of CHAPTERS){
@@ -140,7 +141,7 @@ export function normalise(raw){
   s.chapters[id]={stage:stages.includes(c.stage)?c.stage:'meaning',index:int(c.index,0,PRACTICE.filter(q=>q.chapter===id).length-1),visited:Array.isArray(c.visited)?[...new Set(c.visited.filter(x=>stages.includes(x)))]:[],collected:c.collected===true};
  }
  const legacy75=[...Array.from({length:10},(_,i)=>i+1),...Array.from({length:30},(_,i)=>i+31),11,12,13,14,15,...Array.from({length:15},(_,i)=>i+61),...Array.from({length:15},(_,i)=>i+16)].map(i=>'t-'+i);
- const scope=run=>{const ids=Array.isArray(run.questionIds)?[...new Set(run.questionIds.filter(id=>TEST.some(q=>q.id===id)))]:raw.contentVersion===VERSION?TEST.map(q=>q.id):raw.contentVersion==='1.2.0'?legacy75:Array.from({length:raw.contentVersion==='1.1.0'?30:10},(_,i)=>'t-'+(i+1));return ids.length?ids:Array.from({length:10},(_,i)=>'t-'+(i+1));};
+ const scope=run=>{const ids=Array.isArray(run.questionIds)?[...new Set(run.questionIds.filter(id=>TEST.some(q=>q.id===id)))]:['1.3.0',VERSION].includes(raw.contentVersion)?TEST.map(q=>q.id):raw.contentVersion==='1.2.0'?legacy75:Array.from({length:raw.contentVersion==='1.1.0'?30:10},(_,i)=>'t-'+(i+1));return ids.length?ids:Array.from({length:10},(_,i)=>'t-'+(i+1));};
  const d=raw.test.draft;
  if(obj(d))s.test.draft={questionIds:scope(d),seed:typeof d.seed==='string'?d.seed.slice(0,80):'legacy',answers:testAnswers(d.answers),hints:Array.isArray(d.hints)?[...new Set(d.hints.filter(id=>TEST.some(q=>q.id===id)))]:[],index:int(d.index,0,scope(d).length-1)};
  for(const run of (Array.isArray(raw.test.runs)?raw.test.runs:[]).slice(-20)){
@@ -149,6 +150,13 @@ export function normalise(raw){
   const hints=Array.isArray(run.hints)?run.hints.filter(id=>TEST.some(q=>q.id===id)):[];
   s.test.runs.push({questionIds:scope(run),seed:typeof run.seed==='string'?run.seed.slice(0,80):'legacy',answers,hints:[...new Set(hints)],completedAt:typeof run.completedAt==='string'?run.completedAt.slice(0,40):''});
  }
+ const study=raw.study;
+ if(obj(study)){
+  s.study.semester=int(study.semester,1,4,1);s.study.query=typeof study.query==='string'?study.query.slice(0,120):'';
+  s.study.returnTo=typeof study.returnTo==='string'&&own(BY_ID,study.returnTo)?study.returnTo:null;
+  if(obj(study.panels))for(const q of QUESTIONS){const p=study.panels[q.id];if(obj(p))s.study.panels[q.id]=Object.fromEntries(['knowledge','hint','example','solution'].map(k=>[k,p[k]===true]));}
+  if(obj(study.proofSteps))for(const [id,p] of Object.entries(PROOF_BY_ID))if(own(study.proofSteps,id))s.study.proofSteps[id]=int(study.proofSteps[id],1,p.steps.length,1);
+ }else for(const [id,r] of Object.entries(s.records)){if(r.events.some(e=>e.kind==='reveal'))s.study.panels[id]={knowledge:false,hint:false,example:false,solution:true};}
  s.models=normaliseModels(raw.models);
  s.foundation=normaliseFoundation(raw.foundation);
  s.yearTwo=normaliseYearTwo(raw.yearTwo);
@@ -158,6 +166,7 @@ export function normalise(raw){
   if(s.labs.preset==='branch')s.labs.input=Math.max(1,s.labs.input);
  }
  if(obj(raw.resume))s.resume={page:pages.includes(raw.resume.page)?raw.resume.page:'home',chapter:CHAPTERS.some(c=>c.id===raw.resume.chapter)?raw.resume.chapter:'one'};
+ if(['task','proof'].includes(s.resume.page)){const key=s.resume.page==='task'?'question':'proof',id=raw.resume[key];if(typeof id==='string'&&(key==='question'?own(BY_ID,id):own(PROOF_BY_ID,id)))s.resume[key]=id;else s.resume.page='home';}
  return s;
 }
 export function exportText(state){
@@ -191,7 +200,7 @@ export function stats(state,chapter=null){
  return {total:qs.length,solved:ss.filter(x=>x.solved).length,independent:ss.filter(x=>x.independent).length,assisted:ss.filter(x=>x.solved&&!x.independent&&x.last.assisted).length,corrected:ss.filter(x=>x.solved&&!x.independent&&!x.last.assisted).length};
 }
 export function reviewIds(state){
- return PRACTICE.filter(q=>{
+ return [...PRACTICE,...SEMINAR_QUESTIONS].filter(q=>{
   const r=state.records[q.id],s=status(r,q);
   return s.pinned||(r&&(!s.independent||s.helped));
  }).map(q=>q.id);
