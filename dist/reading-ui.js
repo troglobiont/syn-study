@@ -8,8 +8,11 @@ const taskNoun=n=>n%100>=11&&n%100<=14?'задач':n%10===1?'задача':[2,3
 const a=(label,path,extra='')=>'<a href="#'+path+'" '+extra+'>'+e(label)+'</a>';
 const btn=(label,action,extra='',kind='secondary')=>'<button class="btn '+kind+'" type="button" data-action="'+action+'" '+extra+'>'+e(label)+'</button>';
 export function topicPath(ref){const c=CHAPTERS.find(c=>c.id===ref.chapter),index=c?.theory.findIndex(t=>t.title===ref.topic);return index>=0?'lesson/'+c.id+'/meaning/topic-'+index:'lesson/'+ref.chapter+'/meaning';}
-export function knowledgeLinks(refs,returnTo=''){return '<ul class="knowledge-list">'+refs.map(ref=>'<li>'+a(ref.topic,topicPath(ref),returnTo?'data-reading-return="'+e(returnTo)+'"':'')+'<span>'+e(CHAPTERS.find(c=>c.id===ref.chapter)?.title)+'</span></li>').join('')+'</ul>';}
-export function stepList(steps){return '<ol class="reasoned-steps">'+steps.map((s,i)=>'<li><span class="step-number">Шаг '+(i+1)+'</span><p class="step-claim">'+e(s.claim)+'</p><div class="step-reason"><strong>Почему этот переход верен</strong><p>'+e(s.reason)+'</p>'+(s.uses?.length?'<p>Используем: '+s.uses.map(id=>a(PROOF_BY_ID[id]?.title||id,'proof/'+id)).join('; ')+'.</p>':'')+'</div></li>').join('')+'</ol>';}
+export function knowledgeLinks(refs,returnTo='',fromProof=false){
+ const attributes=fromProof?'data-reading-link':returnTo?'data-reading-return="'+e(returnTo)+'"':'';
+ return '<ul class="knowledge-list">'+refs.map(ref=>'<li>'+a(ref.topic,topicPath(ref),attributes)+'<span>'+e(CHAPTERS.find(c=>c.id===ref.chapter)?.title)+'</span></li>').join('')+'</ul>';
+}
+export function stepList(steps){return '<ol class="reasoned-steps">'+steps.map((s,i)=>'<li><span class="step-number">Шаг '+(i+1)+'</span><p class="step-claim">'+e(s.claim)+'</p><div class="step-reason"><strong>Почему этот переход верен</strong><p>'+e(s.reason)+'</p>'+(s.uses?.length?'<p>Используем: '+s.uses.map(id=>a(PROOF_BY_ID[id]?.title||id,'proof/'+id,'data-reading-link')).join('; ')+'.</p>':'')+'</div></li>').join('')+'</ol>';}
 const topicMap={one:[0,2,3,4,5],two:[0,2,1,3,5],real:[3,4,8,7,5],sequences:[0,0,9,7,5],limits:[0,1,5,4,10],derivatives:[0,0,3,5,10],numeric:[0,0,4,3,1],indefinite:[0,2,3,4,0],three:[0,3,4,5,7],improper:[0,0,2,5,4],space:[1,3,7,7,2],continuity:[6,3,4,0,7],four:[1,3,4,6,7],five:[0,0,5,4,7],higher:[0,1,2,4,5],smooth:[1,2,4,5,1],measure:[3,2,3,4,5],lebesgue:[0,2,4,1,5],multiple:[6,1,2,4,5],parameters:[3,4,1,3,5],uniformintegrals:[2,0,1,5,3],approximation:[2,3,3,6,0],surface:[2,4,5,3,6],forms:[0,1,6,6,3],six:[1,2,5,9,6],fourier:[1,2,7,5,8]};
 export function guideFor(q){
  if(q.solution)return q;
@@ -29,9 +32,37 @@ export function guidePanel(q,state){const g=guideFor(q),p=state.study.panels[q.i
  (p.solution?'<section class="help-section solution-panel" id="guide-'+q.id+'-solution"><p class="eyebrow">Решение открыто для чтения</p><h3>Решение по шагам</h3><p>'+e(g.solution.strategy)+'</p>'+stepList(g.solution.steps)+'<div class="solution-result"><strong>Ответ</strong><p>'+e(g.solution.result||answerText(q))+'</p></div>'+knowledgeLinks(g.prerequisites||[],q.id)+'</section>':'')+'</section>';
 }
 export function returnLink(state){const id=state.study.returnTo,q=BY_ID[id];return q?'<aside class="reading-return">'+a('← Вернуться к задаче: '+q.title,id.startsWith('s-')?'task/'+id:id.startsWith('t-')?'test/run':'lesson/'+q.chapter+'/practice','data-return-question="'+q.id+'"')+'</aside>':'';}
-export function proofLinks(c,topic=null){const ps=PROOFS.filter(p=>p.chapter===c.id&&(!topic||p.prerequisites?.some(r=>r.chapter===c.id&&r.topic===topic)));return ps.length?'<details class="proof-links"><summary>Доказательства по шагам · '+ps.length+'</summary><ul>'+ps.map(p=>'<li>'+a(p.title,'proof/'+p.id)+(p.note?'<span class="caption">'+e(p.note)+'</span>':'')+'</li>').join('')+'</ul></details>':'';}
-export function proofsPage(chapter=null){const ps=PROOFS.filter(p=>!chapter||p.chapter===chapter);return '<section class="reading-page"><p class="eyebrow">Определения → условия → выводы</p><h1>Доказательства по шагам</h1><p class="lead">Каждый переход сопровождается основанием. Можно читать последовательно или открыть все шаги сразу. У частных версий теорем область действия указана в формулировке.</p><nav class="reading-chapters" aria-label="Главы доказательств">'+a('Все главы','proofs')+CHAPTERS.map(c=>a(c.number+' · '+c.title,'proofs/'+c.id)).join('')+'</nav><div class="proof-catalog">'+ps.map(p=>'<article class="panel"><p class="eyebrow">'+e(CHAPTERS.find(c=>c.id===p.chapter)?.title)+'</p><h2>'+a(p.title,'proof/'+p.id)+'</h2><p>'+e(p.statement)+'</p>'+(p.note?'<p class="scope-note">'+e(p.note)+'</p>':'')+'</article>').join('')+'</div></section>';}
-export function proofPage(id,state){const p=PROOF_BY_ID[id];if(!p)return proofsPage();const count=state.study.proofSteps[id]||1;return '<section class="reading-page proof-reader">'+returnLink(state)+'<p>'+a('← К доказательствам главы','proofs/'+p.chapter)+'</p><p class="eyebrow">'+e(CHAPTERS.find(c=>c.id===p.chapter)?.title)+'</p><h1>'+e(p.title)+'</h1><div class="panel"><h2>Что доказываем</h2><p>'+e(p.statement)+'</p><h3>Условия</h3><ul>'+p.assumptions.map(s=>'<li>'+e(s)+'</li>').join('')+'</ul>'+(p.note?'<p class="scope-note">'+e(p.note)+'</p>':'')+'<details><summary>Что нужно знать</summary>'+knowledgeLinks(p.prerequisites||[],state.study.returnTo||'')+'</details></div><p class="caption" role="status">Открыто шагов: '+Math.min(count,p.steps.length)+' из '+p.steps.length+'</p>'+stepList(p.steps.slice(0,count))+'<div class="actions">'+(count<p.steps.length?btn('Следующий шаг →','proof-next','data-proof="'+p.id+'"','primary')+btn('Показать все шаги','proof-all','data-proof="'+p.id+'"'):btn('Свернуть до первого шага','proof-first','data-proof="'+p.id+'"'))+'</div>'+(count>=p.steps.length?'<div class="solution-result"><strong>Вывод</strong><p>'+e(p.conclusion)+'</p></div>':'')+'</section>';}
+export function readingBackLink(origin){
+ if(!origin)return '';
+ return '<aside class="reading-return">'+a(origin.label,e(origin.path),'data-reading-back')+'</aside>';
+}
+export function proofLinks(c,topic=null){
+ const ps=PROOFS.filter(p=>{
+  if(p.chapter!==c.id)return false;
+  if(!topic)return true;
+  if(p.theoryTopic)return p.theoryTopic===topic;
+  return p.prerequisites?.some(r=>r.chapter===c.id&&r.topic===topic);
+ });
+ return ps.length?'<details class="proof-links"><summary>Доказательства по шагам · '+ps.length+'</summary><ul>'+ps.map(p=>'<li>'+a(p.title,'proof/'+p.id,'data-reading-link')+(p.note?'<span class="caption">'+e(p.note)+'</span>':'')+'</li>').join('')+'</ul></details>':'';
+}
+export function proofsPage(chapter=null){const ps=PROOFS.filter(p=>!chapter||p.chapter===chapter);return '<section class="reading-page"><p class="eyebrow">Определения → условия → выводы</p><h1>Доказательства по шагам</h1><p class="lead">Каждый переход сопровождается основанием. Можно читать последовательно или открыть все шаги сразу. У частных версий теорем область действия указана в формулировке.</p><nav class="reading-chapters" aria-label="Главы доказательств">'+a('Все главы','proofs')+CHAPTERS.map(c=>a(c.number+' · '+c.title,'proofs/'+c.id)).join('')+'</nav><div class="proof-catalog">'+ps.map(p=>'<article class="panel"><p class="eyebrow">'+e(CHAPTERS.find(c=>c.id===p.chapter)?.title)+'</p><h2>'+a(p.title,'proof/'+p.id,'data-reading-link')+'</h2><p>'+e(p.statement)+'</p>'+(p.note?'<p class="scope-note">'+e(p.note)+'</p>':'')+'</article>').join('')+'</div></section>';}
+export function proofPage(id,state,origin=null){
+ const p=PROOF_BY_ID[id];
+ if(!p)return proofsPage();
+ const count=state.study.proofSteps[id]||1;
+ const theory=p.theoryTopic?topicPath({chapter:p.chapter,topic:p.theoryTopic}):'lesson/'+p.chapter+'/meaning';
+ const back=readingBackLink(origin)||'<p>'+a('← К теории главы',theory,'data-reading-link')+'</p>';
+ return '<section class="reading-page proof-reader">'+back+
+  '<p class="eyebrow">'+e(CHAPTERS.find(c=>c.id===p.chapter)?.title)+'</p><h1>'+e(p.title)+'</h1>'+
+  '<div class="panel"><h2>Что доказываем</h2><p>'+e(p.statement)+'</p><h3>Условия</h3><ul>'+p.assumptions.map(s=>'<li>'+e(s)+'</li>').join('')+'</ul>'+
+  (p.note?'<p class="scope-note">'+e(p.note)+'</p>':'')+
+  '<details><summary>Что нужно знать</summary>'+knowledgeLinks(p.prerequisites||[],'',true)+'</details></div>'+
+  '<p class="caption" role="status">Открыто шагов: '+Math.min(count,p.steps.length)+' из '+p.steps.length+'</p>'+
+  stepList(p.steps.slice(0,count))+
+  '<div class="actions">'+(count<p.steps.length?btn('Следующий шаг →','proof-next','data-proof="'+p.id+'"','primary')+btn('Показать все шаги','proof-all','data-proof="'+p.id+'"'):btn('Свернуть до первого шага','proof-first','data-proof="'+p.id+'"'))+'</div>'+
+  (count>=p.steps.length?'<div class="solution-result"><strong>Вывод</strong><p>'+e(p.conclusion)+'</p></div>':'')+
+  '<p>'+a('Все доказательства главы','proofs/'+p.chapter)+'</p></section>';
+}
 export function matchingSeminars(state){const query=state.study.query.trim().toLocaleLowerCase('ru');return SEMINARS.filter(s=>s.semester===state.study.semester&&(!query||[s.title,CHAPTERS.find(c=>c.id===s.chapter)?.title,...s.references.map(r=>r.book+' '+r.numbers)].join(' ').toLocaleLowerCase('ru').includes(query)));}
 export function sourceCard(s){return '<div class="seminar-source"><p><a href="'+e(s.source)+'" target="_blank" rel="noreferrer">'+e(s.sourceLabel)+'</a>'+(s.sourceItem?' · пункт '+e(s.sourceItem):'')+'</p>'+s.references.map(r=>'<p><strong>'+e(r.book)+'</strong><br>'+e(r.edition)+' · № '+e(r.numbers)+'</p>').join('')+(s.note?'<p class="scope-note">'+e(s.note)+'</p>':'')+'</div>';}
 export function seminarCards(state){const ss=matchingSeminars(state);return '<p class="caption" role="status">Найдено тем: '+ss.length+'</p>'+ss.map(s=>{const qs=SEMINAR_QUESTIONS.filter(q=>q.seminarId===s.id);return '<article class="panel seminar-card" id="seminar-'+s.id+'"><p class="eyebrow">Семестр '+s.semester+' · '+e(CHAPTERS.find(c=>c.id===s.chapter)?.title)+'</p><h2>'+e(s.title)+'</h2>'+sourceCard(s)+'<div class="actions">'+a('Теория главы','lesson/'+s.chapter+'/meaning','class="btn secondary"')+a('Доказательства','proofs/'+s.chapter,'class="btn secondary"')+'</div>'+(qs.length?'<h3>Встроенные задачи SYN по этой теме</h3><ul class="task-list">'+qs.map(q=>'<li>'+a(q.title,'task/'+q.id)+'</li>').join('')+'</ul>':'<p class="caption">Задания из задачника указаны выше. '+a('Встроенные задачи по этой главе','seminars/chapter/'+s.chapter)+'.</p>')+'</article>';}).join('')+(ss.length?'':'<p class="empty-state">Тем с таким запросом в выбранном семестре нет. Попробуйте название раздела или другой семестр.</p>');}

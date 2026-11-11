@@ -8,7 +8,7 @@ import {SYLLABUS,PROGRAM_SOURCE} from './syllabus.js';
 import {foundationLab,foundationOutput,normaliseFoundation} from './foundation-models.js';
 import {PROOFS,PROOF_BY_ID} from './proofs.js';
 import {SEMINARS} from './seminar-content.js';
-import {guidePanel,returnLink,proofLinks,proofsPage,proofPage,seminarsPage,seminarCards,sourceCard} from './reading-ui.js';
+import {guidePanel,returnLink,readingBackLink,proofLinks,proofsPage,proofPage,seminarsPage,seminarCards,sourceCard} from './reading-ui.js';
 const $=s=>document.querySelector(s);
 const nativeAndroid=typeof window.SynAndroid?.saveJson==='function';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -60,12 +60,12 @@ function home(){
  '<section class="test-invite"><span class="test-orbit" aria-hidden="true">∴</span><div><p class="eyebrow">Задания по всем главам</p><h2>Итоговая самопроверка</h2><p>'+TEST.length+' вопросов. Разбор после сдачи, без таймера. Можно прерывать и продолжать.</p></div>'+link('К самопроверке →','test','primary')+'</section>'+
  '<section class="below-grid"><div><p class="eyebrow">Результаты изучения</p><h3>Краткие итоги глав</h3><p>Первая попытка, исправления и использование помощи учитываются отдельно.</p><p class="muted">'+s.solved+' из '+s.total+' задач решено · '+CHAPTERS.filter(c=>state.chapters[c.id].collected).length+' из '+CHAPTERS.length+' итогов сохранено</p></div><details class="sources"><summary>Учебные материалы и работа без сети</summary><p>Тексты, разобранные примеры и практика встроены в приложение. Ссылки для продолжения чтения приведены в главах; внешние материалы требуют интернета. Произвольные доказательства автоматически не оцениваются.</p><p>Для повторения в видео — <a href="https://youtu.be/NX4s0ZE97Kc" target="_blank" rel="noreferrer">обзор первого семестра</a>. Он не является источником порядка глав этой редакции.</p></details></section>';
 }
-function lesson(r){
+function lesson(r,origin){
  const c=CHAPTERS.find(c=>c.id===r.chapter),cs=state.chapters[c.id];cs.stage=r.stage;
  if(!cs.visited.includes(r.stage))cs.visited.push(r.stage);
  const index=stages.findIndex(s=>s[0]===r.stage);
  let body='';
- if(r.stage==='meaning')body='<div class="lesson-heading"><p class="eyebrow">'+(c.program==='S3-P'?'Семестр 3 · подготовительная глава SYN':'Семестр '+c.semester+' · раздел '+c.program+' программы')+'</p><h2>'+c.title+'</h2><p class="lead">'+c.subtitle+'</p></div>'+returnLink(state)+(c.prerequisites?'<aside class="hint-box"><strong>Предварительные знания</strong><p>'+c.prerequisites+'</p></aside>':'')+c.theory.map((t,i)=>'<article class="theory-block" id="topic-'+i+'"><span class="block-number">'+String(i+1).padStart(2,'0')+'</span><div><h3>'+t.title+'</h3>'+t.body+'<div class="formula">'+esc(t.formula)+'</div>'+proofLinks(c,t.title)+'</div></article>').join('')+'<details class="deep"><summary>Обоснование</summary><p>'+esc(c.deep)+'</p></details>'+(c.sources?'<details class="sources"><summary>Материалы для продолжения</summary><ul>'+c.sources.map(([title,url])=>'<li><a href="'+url+'" target="_blank" rel="noreferrer">'+title+'</a></li>').join('')+'</ul></details>':'')+'<div class="actions">'+link('Все доказательства главы','proofs/'+c.id)+link('Семинарские задачи','seminars/chapter/'+c.id)+'</div>'+stageFooter(c.id,r.stage);
+ if(r.stage==='meaning')body='<div class="lesson-heading"><p class="eyebrow">'+(c.program==='S3-P'?'Семестр 3 · подготовительная глава SYN':'Семестр '+c.semester+' · раздел '+c.program+' программы')+'</p><h2>'+c.title+'</h2><p class="lead">'+c.subtitle+'</p></div>'+(readingBackLink(origin)||returnLink(state))+(c.prerequisites?'<aside class="hint-box"><strong>Предварительные знания</strong><p>'+c.prerequisites+'</p></aside>':'')+c.theory.map((t,i)=>'<article class="theory-block" id="topic-'+i+'"><span class="block-number">'+String(i+1).padStart(2,'0')+'</span><div><h3>'+t.title+'</h3>'+t.body+'<div class="formula">'+esc(t.formula)+'</div>'+proofLinks(c,t.title)+'</div></article>').join('')+'<details class="deep"><summary>Обоснование</summary><p>'+esc(c.deep)+'</p></details>'+(c.sources?'<details class="sources"><summary>Материалы для продолжения</summary><ul>'+c.sources.map(([title,url])=>'<li><a href="'+url+'" target="_blank" rel="noreferrer">'+title+'</a></li>').join('')+'</ul></details>':'')+'<div class="actions">'+link('Все доказательства главы','proofs/'+c.id)+link('Семинарские задачи','seminars/chapter/'+c.id)+'</div>'+stageFooter(c.id,r.stage);
  if(r.stage==='lab')body=(c.id==='one'?relationLab():c.id==='two'?mappingLab():c.yearTwo?yearTwoLab(c,state.yearTwo):c.foundation?foundationLab(c,state.foundation):advancedLab(c,state.models))+stageFooter(c.id,r.stage);
  if(r.stage==='practice')body=practice(c);
  if(r.stage==='insight'){const p=stats(state,c.id);body='<div class="insight-sheet"><p class="eyebrow">Итоги главы / '+c.number+'</p><div class="insight-mark" aria-hidden="true">'+(c.id==='one'?'∃!':c.symbol)+'</div><h2>'+c.card+'</h2><p class="lead">'+esc(c.takeaway)+'</p><div class="formula">'+(c.summaryFormula||(c.id==='one'?'∀x ∈ A ∃!y ∈ B: f(x)=y':'Обратимость f: A→B ⇔ f — биекция'))+'</div><p>Практика: '+p.solved+' / 5 решено, '+p.independent+' с первой попытки. Сохранение итогов отмечает их просмотр и не изменяет результаты задач.</p>'+button(cs.collected?'Итоги сохранены ✓':'Сохранить итоги главы','collect','data-chapter="'+c.id+'"','primary')+'</div><div class="actions">'+link('← К практике','lesson/'+c.id+'/practice')+link(CHAPTERS[CHAPTERS.indexOf(c)+1]?'К главе '+CHAPTERS[CHAPTERS.indexOf(c)+1].number+' →':'К итоговой самопроверке →',CHAPTERS[CHAPTERS.indexOf(c)+1]?'lesson/'+CHAPTERS[CHAPTERS.indexOf(c)+1].id+'/meaning':'test','primary')+'</div>';}
@@ -133,12 +133,13 @@ function dataPage(){
 }
 function render(){
  const r=route();currentRoute=r;
+ const origin=history.state?.readingFrom;
  formMessage='';
  if(r.page==='lesson')state.resume={page:'lesson',chapter:r.chapter};
  else if(r.page==='task')state.resume={page:'task',chapter:BY_ID[r.question].chapter,question:r.question};
  else if(r.page==='proof')state.resume={page:'proof',chapter:PROOF_BY_ID[r.proof].chapter,proof:r.proof};
  else if(r.page==='test'&&r.sub==='run')state.resume={page:'test',chapter:'one'};
- const body=r.page==='seminars'?seminarsPage(state,r.chapter):r.page==='proofs'?proofsPage(r.chapter):r.page==='proof'?proofPage(r.proof,state):r.page==='task'?taskPage(r.question):r.page==='home'?home():r.page==='lesson'?lesson(r):r.page==='test'?testPage(r):r.page==='results'?results():r.page==='review'?review():dataPage();
+ const body=r.page==='seminars'?seminarsPage(state,r.chapter):r.page==='proofs'?proofsPage(r.chapter):r.page==='proof'?proofPage(r.proof,state,origin):r.page==='task'?taskPage(r.question):r.page==='home'?home():r.page==='lesson'?lesson(r,origin):r.page==='test'?testPage(r):r.page==='results'?results():r.page==='review'?review():dataPage();
  $('#app').innerHTML=shell(body,r);
  if(!store.blocked)save();
  document.title='SYN Study · '+(r.page==='lesson'?CHAPTERS.find(c=>c.id===r.chapter).title:'Математический анализ');
@@ -228,8 +229,52 @@ document.addEventListener('change',async e=>{
   }
  }catch(err){announce(err.message);e.target.value='';}
 });
+function followReadingLink(e){
+ if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return false;
+ if(e.target.closest('[data-reading-back]')){
+  e.preventDefault();
+  history.back();
+  return true;
+ }
+ const anchor=e.target.closest('a[data-reading-link]');
+ if(!anchor||anchor.hash===location.hash)return false;
+
+ const topic=anchor.closest('.theory-block');
+ const title=topic?.querySelector('h3').textContent;
+ let label='← Вернуться к предыдущей странице';
+ if(title)label='← Вернуться к пункту «'+title+'»';
+ else if(currentRoute.page==='proof')label='← Вернуться к доказательству';
+ else if(currentRoute.page==='proofs')label='← Вернуться к списку доказательств';
+ else if(currentRoute.page==='lesson')label='← Вернуться к теории главы';
+
+ e.preventDefault();
+ // Each entry keeps its own origin, including nested prerequisite visits.
+ const readingPosition={href:anchor.hash,topic:topic?.id,top:window.scrollY};
+ history.replaceState({...history.state,readingPosition},'');
+ history.pushState({readingFrom:{path:location.hash.slice(1),label}},'',anchor.hash);
+ render();
+ focusTopic();
+ return true;
+}
+function restoreReadingPosition(){
+ const position=history.state?.readingPosition;
+ if(!position)return false;
+ const scope=position.topic?document.getElementById(position.topic):document;
+ const anchor=Array.from(scope?.querySelectorAll('a[data-reading-link]')||[])
+  .find(link=>link.hash===position.href);
+ if(!anchor)return false;
+ const details=anchor.closest('details');
+ if(details)details.open=true;
+ anchor.focus({preventScroll:true});
+ window.scrollTo(0,position.top);
+ if(anchor.getBoundingClientRect().bottom<0||anchor.getBoundingClientRect().top>window.innerHeight){
+  anchor.scrollIntoView({block:'center'});
+ }
+ return true;
+}
 document.addEventListener('click',e=>{
  if(e.target.closest('.skip-link')){e.preventDefault();$('#main').focus();return;}
+ if(followReadingLink(e))return;
  const reading=e.target.closest('[data-reading-return]');if(reading){state.study.returnTo=reading.dataset.readingReturn;save();}
  const returning=e.target.closest('[data-return-question]');if(returning){e.preventDefault();const id=returning.dataset.returnQuestion;if(id.startsWith('t-')&&state.test.draft){const index=testQuestions(state.test.draft).findIndex(q=>q.id===id);if(index>=0){testIndex(index);return;}}questionAt(id);return;}
  const el=e.target.closest('[data-action]');if(!el)return;
@@ -273,12 +318,23 @@ document.addEventListener('click',e=>{
   if(a==='raw-backup'){const raw=store.rawBackup();if(!raw)throw Error('Резервной копии пока нет.');download(raw,'SYN-Study-raw-backup.json');}
  }catch(err){announce(err.message);save();}
 });
-function focusTopic(){if(currentRoute?.topic){const el=$('#'+currentRoute.topic);if(el){el.scrollIntoView({block:'start'});el.tabIndex=-1;el.focus({preventScroll:true});return;}}window.scrollTo(0,0);$('#main').focus({preventScroll:true});}
-window.addEventListener('hashchange',()=>{render();focusTopic();});
+function focusTopic(){
+ const topic=currentRoute?.topic&&document.getElementById(currentRoute.topic);
+ if(topic){
+  const back=$('.lesson-body > .reading-return');
+  if(back)topic.style.scrollMarginTop=(back.offsetHeight+20)+'px';
+  topic.scrollIntoView({block:'start'});
+  focusReading('#'+topic.id);
+  return;
+ }
+ window.scrollTo(0,0);
+ $('#main').focus({preventScroll:true});
+}
+window.addEventListener('hashchange',()=>{render();if(!restoreReadingPosition())focusTopic();});
 window.addEventListener('storage',()=>{const w=$('#save-warning');if(w){w.hidden=false;w.textContent='Данные или режим изменились в другой вкладке. Перед продолжением перезагрузите страницу.';}});
 if(!location.hash){const r=state.resume;if(r.page==='lesson')location.replace('#lesson/'+r.chapter+'/'+state.chapters[r.chapter].stage);else if(r.page==='task'&&r.question)location.replace('#task/'+r.question);else if(r.page==='proof'&&r.proof)location.replace('#proof/'+r.proof);}
 render();
-if(currentRoute.topic)focusTopic();
+if(!restoreReadingPosition()&&currentRoute.topic)focusTopic();
 if('serviceWorker' in navigator&&location.protocol!=='file:'&&!nativeAndroid){
- navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(()=>navigator.serviceWorker.ready).then(async()=>{offlineReady=await caches.has('syn-study-shell-1.4.0');}).catch(()=>{offlineReady=false;});
+ navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(()=>navigator.serviceWorker.ready).then(async()=>{offlineReady=await caches.has('syn-study-shell-'+VERSION);}).catch(()=>{offlineReady=false;});
 }

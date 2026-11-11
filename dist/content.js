@@ -6,7 +6,7 @@ import {YEAR_TWO_PRACTICE,YEAR_TWO_TEST} from './year-two-questions.js';
 import {SEMINAR_QUESTIONS} from './seminar-content.js';
 export {SEMINAR_QUESTIONS} from './seminar-content.js';
 import {arrangeCourse} from './syllabus.js';
-export const VERSION = '1.4.0';
+export const VERSION = '1.4.1';
 const choice = (id, label, options, answer) => ({id, type:'choice', label, options:options.map((text,i)=>({id:String(i),text})), answer:String(answer)});
 const multi = (id, label, options, answer) => ({...choice(id,label,options,0),type:'multi',answer:answer.map(String)});
 const number = (id,label,answer,rule='equal') => ({id,type:'number',label,answer,rule});
@@ -141,6 +141,8 @@ export const GLOSSARY = [
  ['Инъекция','Для любых x₁,x₂∈A из f(x₁)=f(x₂) следует x₁=x₂.'],
  ['Сюръекция на B','Для каждого y∈B существует x∈A, для которого f(x)=y. Эквивалентно: f(A)=B.'],
  ['Биекция','Функция, одновременно являющаяся инъекцией и сюръекцией.'],
+ ['|A|','Мощность множества A. Для конечного A это число его элементов. Равенство |A|=|B| означает существование биекции A→B.'],
+ ['𝒫(A)','Множество всех подмножеств A. Его элементы — множества E⊆A.'],
  ['Обратная функция f⁻¹: B→A','Для биекции f: A→B обратная функция удовлетворяет f⁻¹(f(x))=x и f(f⁻¹(y))=y. Это не функция 1/f.'],
  ['Полный прообраз f⁻¹(E)','Множество {x∈A: f(x)∈E} для E⊆B. Определено для любой функции; существование обратной функции не требуется.'],
  ['s ∘ r','Композиция: (s∘r)(x)=s(r(x)). Для r: A→B и s: B→C это функция A→C.'],

@@ -228,6 +228,20 @@ public final class LearningJourneyTest {
         await("document.activeElement?.id==='topic-8'");
         assertEquals(Boolean.TRUE,js("!!document.querySelector('#topic-8 a[href=\"#proof/bolzano-weierstrass\"]')"));
 
+        route("#lesson/one/meaning/topic-9");
+        await("document.activeElement?.id==='topic-9'");
+        click("#topic-9 summary");
+        click("#topic-9 a[href='#proof/cantor-power']");
+        await("location.hash==='#proof/cantor-power' && !!document.querySelector('[data-reading-back]')");
+        click(".proof-reader .panel summary");
+        click(".proof-reader a[href='#lesson/one/meaning/topic-7']");
+        await("document.activeElement?.id==='topic-7'");
+        click("[data-reading-back]");
+        await("location.hash==='#proof/cantor-power' && document.activeElement?.hash==='#lesson/one/meaning/topic-7'");
+        click("[data-reading-back]");
+        await("location.hash==='#lesson/one/meaning/topic-9' && document.activeElement?.hash==='#proof/cantor-power'");
+        assertEquals(Boolean.TRUE,js("document.querySelector('#topic-9 details').open"));
+
         for(String chapter:new String[]{"one","two","real","sequences","limits","derivatives","numeric","indefinite","three","improper","space","continuity","four","five","higher","smooth","measure","lebesgue","multiple","parameters","uniformintegrals","approximation","surface","forms","six","fourier"}) {
             for(int n=1;n<=2;n++) {
                 String id="s-"+chapter+"-"+n;

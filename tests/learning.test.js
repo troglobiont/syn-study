@@ -7,7 +7,7 @@ import {SEMINARS} from '../dist/seminar-content.js';
 import {PROOFS,PROOF_BY_ID} from '../dist/proofs.js';
 import {LEGACY_SOLUTIONS} from '../dist/legacy-solutions.js';
 import {fresh,normalise,exportText,importText,event,status,record,submit,grade,reviewIds,orderedOptions,testResult,finishTest,startTest} from '../dist/core.js';
-import {guideFor,guidePanel,topicPath,proofPage,matchingSeminars,seminarCards} from '../dist/reading-ui.js';
+import {guideFor,guidePanel,topicPath,proofLinks,proofPage,matchingSeminars,seminarCards} from '../dist/reading-ui.js';
 const correct=q=>Object.fromEntries(q.parts.map(p=>[p.id,p.type==='multi'?p.answer:p.type==='choice'?p.answer:p.type==='set'?p.answer.join(';'):String(p.answer)]));
 function validRef(ref){const c=CHAPTERS.find(c=>c.id===ref.chapter);assert.ok(c,'Missing chapter '+ref.chapter);assert.ok(c.theory.some(t=>t.title===ref.topic),'Missing topic '+ref.chapter+': '+ref.topic);assert.match(topicPath(ref),/\/meaning\/topic-\d+$/);}
 test('all 260 previously released questions and test scope retain identity, option order and exact keys',()=>{
@@ -43,6 +43,22 @@ test('reading a solution immediately records reading, never a fictitious correct
  assert.equal(status(s.records[q.id],q).solved,false);assert.equal(s.records[q.id].events.length,1);assert.match(guidePanel(q,s),/Решение по шагам/);assert.ok(!s.records[q.id].events.some(e=>e.kind==='submit'));
  s.study.panels[q.id].solution=false;assert.equal(status(s.records[q.id],q).revealed,true);submit(s,q.id,correct(q));assert.equal(status(s.records[q.id],q).solved,true);assert.equal(status(s.records[q.id],q).independent,false);
 });
+test('Cantor proof appears after its definitions and links back to the definitions independently',()=>{
+ const chapter=CHAPTERS.find(c=>c.id==='one');
+ const proof=PROOF_BY_ID['cantor-power'];
+ const theoremIndex=chapter.theory.findIndex(t=>t.title===proof.theoryTopic);
+ assert.ok(theoremIndex>=0);
+ assert.deepEqual(proof.prerequisites.map(r=>r.topic),[
+  'Определение функции','Мощность множества','Множество всех подмножеств'
+ ]);
+ for(const ref of proof.prerequisites){
+  const index=chapter.theory.findIndex(t=>t.title===ref.topic);
+  assert.ok(index>=0&&index<theoremIndex,ref.topic);
+  assert.doesNotMatch(proofLinks(chapter,ref.topic),/#proof\/cantor-power/);
+ }
+ assert.match(proofLinks(chapter,proof.theoryTopic),/#proof\/cantor-power/);
+ assert.match(proofPage(proof.id,fresh()),new RegExp('href="#lesson/one/meaning/topic-'+theoremIndex+'"'));
+});
 test('theory, example and solution panels are independent and exact links preserve the return question',()=>{
  const s=fresh(),q=SEMINAR_QUESTIONS[0];let html=guidePanel(q,s);assert.ok(!html.includes('solution-panel'));s.study.panels[q.id]={knowledge:true};html=guidePanel(q,s);assert.ok(html.includes('data-reading-return="'+q.id+'"'));assert.ok(!html.includes('solution-panel'));
  s.study.panels[q.id]={example:true};html=guidePanel(q,s);assert.ok(html.includes('Другой пример на тот же метод'));assert.ok(!html.includes('solution-panel'));
@@ -50,6 +66,7 @@ test('theory, example and solution panels are independent and exact links preser
 test('new drafts, read solutions, proof position and pins survive export/import and do not overwrite legacy scopes',()=>{
  const s=fresh(),q=SEMINAR_QUESTIONS[4];record(s,q.id).draft={a:'123'};record(s,q.id).pinned=true;event(s,q.id,'hint');s.study.panels[q.id]={knowledge:true,solution:true};s.study.returnTo=q.id;s.study.proofSteps['bolzano-weierstrass']=5;s.study.semester=3;s.study.query='Лебега';s.resume={page:'task',chapter:q.chapter,question:q.id};
  const n=importText(exportText(s));assert.deepEqual(n,normalise(s));assert.ok(reviewIds(n).includes(q.id));assert.equal(n.study.proofSteps['bolzano-weierstrass'],5);assert.equal(n.resume.question,q.id);assert.equal(n.records[q.id].draft.a,'123');
+ assert.deepEqual(normalise({...s,contentVersion:'1.4.0'}),n);
 });
 test('untrusted study state is bounded and catalogue rendering escapes query text',()=>{
  const s=fresh();s.study={panels:{evil:{solution:true}},proofSteps:{evil:999,'bolzano-weierstrass':999999},semester:999,query:'<script>alert(1)</script>',returnTo:'__proto__'};const n=normalise(s);assert.equal(n.study.returnTo,null);assert.equal(n.study.panels.evil,undefined);assert.equal(n.study.proofSteps.evil,undefined);assert.equal(n.study.proofSteps['bolzano-weierstrass'],PROOF_BY_ID['bolzano-weierstrass'].steps.length);assert.ok(!seminarCards(n).includes('<script>'));
