@@ -31,12 +31,53 @@ test('52 original seminar exercises have complete reasoned solutions, analogous 
 test('legacy practice has concrete expanded solutions rather than a generic answer wrapper',()=>{
  for(const q of QUESTIONS){const g=LEGACY_SOLUTIONS[q.id];assert.ok(g,q.id);assert.ok(g.strategy&&g.result);assert.ok(g.steps.length>=2,q.id);for(const s of g.steps)assert.ok(s.claim.length>3&&s.reason.length>8,q.id);for(const ref of g.prerequisites)validRef(ref);}
 });
-test('proof library links to real prerequisites and has a valid acyclic dependency graph',()=>{
- assert.ok(PROOFS.length>=60);assert.equal(new Set(PROOFS.map(p=>p.id)).size,PROOFS.length);
- for(const c of CHAPTERS)assert.ok(PROOFS.some(p=>p.chapter===c.id),c.id);
- for(const p of PROOFS){assert.ok(p.statement&&p.conclusion,p.id);assert.ok(p.assumptions.length,p.id);assert.ok(p.steps.length>=4,p.id);for(const ref of p.prerequisites)validRef(ref);for(const s of p.steps){assert.ok(s.claim&&s.reason,p.id);for(const id of s.uses||[])assert.ok(PROOF_BY_ID[id],p.id+' references '+id);}}
- const done=new Set(),stack=new Set();function visit(id){if(done.has(id))return;assert.ok(!stack.has(id),'Circular proof dependency '+id);stack.add(id);for(const s of PROOF_BY_ID[id].steps)for(const dep of s.uses||[])visit(dep);stack.delete(id);done.add(id);}for(const p of PROOFS)visit(p.id);
- const bw=PROOF_BY_ID['bolzano-weierstrass'];assert.ok(bw);assert.ok(bw.steps.length>=7);assert.ok(bw.prerequisites.some(r=>r.topic==='Подпоследовательности и Больцано — Вейерштрасс'));
+test('each proof is attached once and follows the theory and proofs it requires',()=>{
+ assert.equal(PROOFS.length,110);
+ assert.equal(new Set(PROOFS.map(p=>p.id)).size,PROOFS.length);
+ const orderedTopics=CHAPTERS.flatMap(c=>c.theory.map(t=>({chapter:c.id,topic:t.title})));
+ const position=ref=>orderedTopics.findIndex(t=>t.chapter===ref.chapter&&t.topic===ref.topic);
+ const placement=p=>position({chapter:p.chapter,topic:p.theoryTopic});
+ const links=CHAPTERS.flatMap(c=>c.theory.flatMap(t=>[...proofLinks(c,t.title).matchAll(/href="#proof\/([^"]+)"/g)].map(m=>m[1])));
+ assert.deepEqual(links.sort(),PROOFS.map(p=>p.id).sort());
+ for(const c of CHAPTERS){
+  assert.ok(PROOFS.some(p=>p.chapter===c.id),c.id);
+  assert.equal(new Set(c.theory.map(t=>t.anchor)).size,c.theory.length,c.id);
+ }
+ for(const [index,p] of PROOFS.entries()){
+  const home=placement(p);
+  assert.ok(home>=0,p.id);
+  assert.ok(p.statement&&p.conclusion&&p.assumptions.length&&p.steps.length>=4,p.id);
+  assert.ok(p.prerequisites.length,p.id);
+  for(const ref of p.prerequisites){
+   validRef(ref);
+   assert.ok(position(ref)<home,p.id+' needs '+ref.topic+' before its proof');
+  }
+  for(const s of p.steps){
+   assert.ok(s.claim&&s.reason,p.id);
+   for(const id of s.uses||[]){
+    const dependency=PROOF_BY_ID[id];
+    assert.ok(dependency,p.id+' references '+id);
+    const earlier=placement(dependency);
+    assert.ok(earlier<home||(earlier===home&&PROOFS.indexOf(dependency)<index),p.id+' comes before '+id);
+   }
+  }
+ }
+});
+test('reordered theory keeps existing bookmarks and introduces definitions before use',()=>{
+ const sequences=CHAPTERS.find(c=>c.id==='sequences').theory;
+ const bw=sequences.find(t=>t.anchor==='topic-8');
+ const cauchy=sequences.find(t=>t.anchor==='topic-7');
+ assert.equal(bw.title,'Подпоследовательности и Больцано — Вейерштрасс');
+ assert.equal(cauchy.title,'Фундаментальность и критерий Коши');
+ assert.ok(sequences.indexOf(bw)<sequences.indexOf(cauchy));
+ const derivatives=CHAPTERS.find(c=>c.id==='derivatives').theory;
+ assert.equal(derivatives[1].title,'Символы o и O');
+ assert.equal(topicPath({chapter:'derivatives',topic:derivatives[1].title}),'lesson/derivatives/meaning/topic-9');
+ const three=CHAPTERS.find(c=>c.id==='three').theory;
+ assert.equal(three[2].title,'Верхний и нижний интегралы Дарбу');
+ assert.equal(three[3].title,'Критерий Дарбу и достаточные условия');
+ assert.equal(three[3].anchor,'topic-2');
+ assert.deepEqual(guideFor(BY_ID['s-sequences-1']).prerequisites,[{chapter:'sequences',topic:'Алгебра пределов и неравенства'}]);
 });
 test('reading a solution immediately records reading, never a fictitious correct attempt, and never blocks submission',()=>{
  const s=fresh(),q=SEMINAR_QUESTIONS[0];event(s,q.id,'reveal');event(s,q.id,'reveal');s.study.panels[q.id]={solution:true};
@@ -67,6 +108,7 @@ test('new drafts, read solutions, proof position and pins survive export/import 
  const s=fresh(),q=SEMINAR_QUESTIONS[4];record(s,q.id).draft={a:'123'};record(s,q.id).pinned=true;event(s,q.id,'hint');s.study.panels[q.id]={knowledge:true,solution:true};s.study.returnTo=q.id;s.study.proofSteps['bolzano-weierstrass']=5;s.study.semester=3;s.study.query='Лебега';s.resume={page:'task',chapter:q.chapter,question:q.id};
  const n=importText(exportText(s));assert.deepEqual(n,normalise(s));assert.ok(reviewIds(n).includes(q.id));assert.equal(n.study.proofSteps['bolzano-weierstrass'],5);assert.equal(n.resume.question,q.id);assert.equal(n.records[q.id].draft.a,'123');
  assert.deepEqual(normalise({...s,contentVersion:'1.4.0'}),n);
+ assert.deepEqual(normalise({...s,contentVersion:'1.4.1'}),n);
 });
 test('untrusted study state is bounded and catalogue rendering escapes query text',()=>{
  const s=fresh();s.study={panels:{evil:{solution:true}},proofSteps:{evil:999,'bolzano-weierstrass':999999},semester:999,query:'<script>alert(1)</script>',returnTo:'__proto__'};const n=normalise(s);assert.equal(n.study.returnTo,null);assert.equal(n.study.panels.evil,undefined);assert.equal(n.study.proofSteps.evil,undefined);assert.equal(n.study.proofSteps['bolzano-weierstrass'],PROOF_BY_ID['bolzano-weierstrass'].steps.length);assert.ok(!seminarCards(n).includes('<script>'));

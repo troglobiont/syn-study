@@ -7,7 +7,12 @@ const e=escapeHtml;
 const taskNoun=n=>n%100>=11&&n%100<=14?'задач':n%10===1?'задача':[2,3,4].includes(n%10)?'задачи':'задач';
 const a=(label,path,extra='')=>'<a href="#'+path+'" '+extra+'>'+e(label)+'</a>';
 const btn=(label,action,extra='',kind='secondary')=>'<button class="btn '+kind+'" type="button" data-action="'+action+'" '+extra+'>'+e(label)+'</button>';
-export function topicPath(ref){const c=CHAPTERS.find(c=>c.id===ref.chapter),index=c?.theory.findIndex(t=>t.title===ref.topic);return index>=0?'lesson/'+c.id+'/meaning/topic-'+index:'lesson/'+ref.chapter+'/meaning';}
+export function topicPath(ref){
+ const chapter=CHAPTERS.find(c=>c.id===ref.chapter);
+ const topic=chapter?.theory.find(t=>t.title===ref.topic);
+ const lesson='lesson/'+ref.chapter+'/meaning';
+ return topic?lesson+'/'+topic.anchor:lesson;
+}
 export function knowledgeLinks(refs,returnTo='',fromProof=false){
  const attributes=fromProof?'data-reading-link':returnTo?'data-reading-return="'+e(returnTo)+'"':'';
  return '<ul class="knowledge-list">'+refs.map(ref=>'<li>'+a(ref.topic,topicPath(ref),attributes)+'<span>'+e(CHAPTERS.find(c=>c.id===ref.chapter)?.title)+'</span></li>').join('')+'</ul>';
@@ -17,7 +22,8 @@ const topicMap={one:[0,2,3,4,5],two:[0,2,1,3,5],real:[3,4,8,7,5],sequences:[0,0,
 export function guideFor(q){
  if(q.solution)return q;
  const c=CHAPTERS.find(c=>c.id===q.chapter),qs=q.id.startsWith('t-')?TEST.filter(t=>t.chapter===c.id):PRACTICE.filter(t=>t.chapter===c.id),i=Math.max(0,qs.findIndex(t=>t.id===q.id));
- const ref={chapter:c.id,topic:c.theory[(topicMap[c.id]?.[i]??0)]?.title||c.theory[0].title};
+ const anchor="topic-"+(topicMap[c.id]?.[i]??0);
+ const ref={chapter:c.id,topic:c.theory.find(t=>t.anchor===anchor)?.title||c.theory[0].title};
  const legacy=LEGACY_SOLUTIONS[q.id];
  return {...q,prerequisites:legacy?.prerequisites||[ref],solution:legacy||{strategy:'Сопоставим условия задачи с указанным определением или теоремой.',steps:[{claim:q.explanation,reason:'Разбор использует условия, указанные в задаче. Определение и точная формулировка нужного утверждения доступны по ссылке в «Необходимых знаниях».'}],result:answerText(q)},analogous:q.analogous||exampleFor(c,legacy?.prerequisites||[ref])};
 }
@@ -37,12 +43,7 @@ export function readingBackLink(origin){
  return '<aside class="reading-return">'+a(origin.label,e(origin.path),'data-reading-back')+'</aside>';
 }
 export function proofLinks(c,topic=null){
- const ps=PROOFS.filter(p=>{
-  if(p.chapter!==c.id)return false;
-  if(!topic)return true;
-  if(p.theoryTopic)return p.theoryTopic===topic;
-  return p.prerequisites?.some(r=>r.chapter===c.id&&r.topic===topic);
- });
+ const ps=PROOFS.filter(p=>p.chapter===c.id&&(!topic||p.theoryTopic===topic));
  return ps.length?'<details class="proof-links"><summary>Доказательства по шагам · '+ps.length+'</summary><ul>'+ps.map(p=>'<li>'+a(p.title,'proof/'+p.id,'data-reading-link')+(p.note?'<span class="caption">'+e(p.note)+'</span>':'')+'</li>').join('')+'</ul></details>':'';
 }
 export function proofsPage(chapter=null){const ps=PROOFS.filter(p=>!chapter||p.chapter===chapter);return '<section class="reading-page"><p class="eyebrow">Определения → условия → выводы</p><h1>Доказательства по шагам</h1><p class="lead">Каждый переход сопровождается основанием. Можно читать последовательно или открыть все шаги сразу. У частных версий теорем область действия указана в формулировке.</p><nav class="reading-chapters" aria-label="Главы доказательств">'+a('Все главы','proofs')+CHAPTERS.map(c=>a(c.number+' · '+c.title,'proofs/'+c.id)).join('')+'</nav><div class="proof-catalog">'+ps.map(p=>'<article class="panel"><p class="eyebrow">'+e(CHAPTERS.find(c=>c.id===p.chapter)?.title)+'</p><h2>'+a(p.title,'proof/'+p.id,'data-reading-link')+'</h2><p>'+e(p.statement)+'</p>'+(p.note?'<p class="scope-note">'+e(p.note)+'</p>':'')+'</article>').join('')+'</div></section>';}
@@ -50,7 +51,7 @@ export function proofPage(id,state,origin=null){
  const p=PROOF_BY_ID[id];
  if(!p)return proofsPage();
  const count=state.study.proofSteps[id]||1;
- const theory=p.theoryTopic?topicPath({chapter:p.chapter,topic:p.theoryTopic}):'lesson/'+p.chapter+'/meaning';
+ const theory=topicPath({chapter:p.chapter,topic:p.theoryTopic});
  const back=readingBackLink(origin)||'<p>'+a('← К теории главы',theory,'data-reading-link')+'</p>';
  return '<section class="reading-page proof-reader">'+back+
   '<p class="eyebrow">'+e(CHAPTERS.find(c=>c.id===p.chapter)?.title)+'</p><h1>'+e(p.title)+'</h1>'+

@@ -227,6 +227,8 @@ public final class LearningJourneyTest {
         route("#lesson/sequences/meaning/topic-8");
         await("document.activeElement?.id==='topic-8'");
         assertEquals(Boolean.TRUE,js("!!document.querySelector('#topic-8 a[href=\"#proof/bolzano-weierstrass\"]')"));
+        assertEquals(Boolean.TRUE,js("!document.querySelector('#topic-6 a[href=\"#proof/bolzano-weierstrass\"]')"));
+        assertEquals(Boolean.TRUE,js("Boolean(document.querySelector('#topic-8').compareDocumentPosition(document.querySelector('#topic-7')) & Node.DOCUMENT_POSITION_FOLLOWING)"));
 
         route("#lesson/one/meaning/topic-9");
         await("document.activeElement?.id==='topic-9'");
