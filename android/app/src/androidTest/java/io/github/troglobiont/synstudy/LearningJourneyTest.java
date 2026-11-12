@@ -399,6 +399,15 @@ public final class LearningJourneyTest {
             route("#task/s-sequences-1");
             await("document.querySelector('#field-a')?.value==='3/2'");
             assertEquals(Boolean.TRUE,js("!!document.querySelector('.solution-panel')"));
+            click("[data-action='cheatsheet']");
+            await("document.querySelector('#cheatsheet')?.open===true");
+            click("#cheatsheet details:has(.angle-table) summary");
+            await("document.querySelector('.angle-table')?.closest('details').open===true");
+            assertEquals(Boolean.TRUE,js("document.querySelector('.angle-table').textContent.includes('60°')"));
+            device.pressBack();
+            await("!document.querySelector('#cheatsheet').open");
+            assertEquals("#task/s-sequences-1",js("location.hash"));
+            assertEquals("3/2",js("document.querySelector('#field-a').value"));
             route("#proof/bolzano-weierstrass");
             await("document.querySelectorAll('.proof-reader .step-reason').length===7");
             route("#results");

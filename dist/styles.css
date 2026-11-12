@@ -61,3 +61,33 @@
 @media(max-width:760px){.reading-page{padding:28px 0 55px}.reading-page h1{font-size:2.25rem;line-height:1.2}.reading-page .lead{font-size:16px}.practice-catalog{grid-template-columns:1fr}.help-section{padding:18px}.step-claim{font-size:1.15rem}.step-reason{padding:15px;font-size:15px}.task-help .help-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.task-help .help-actions .btn{padding:10px 12px;font-size:12px;min-height:50px}.topbar nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px;justify-items:start}.reading-chapters{max-height:180px;overflow:auto;padding:8px 0}.semester-filter .btn{flex:1 1 40%;padding:10px}.reading-return{font-size:12px}.catalog-filter{grid-template-columns:minmax(0,1fr) auto}.catalog-filter .btn{padding:12px}.seminar-card .actions .btn{width:auto}.proof-reader .panel{padding:20px}}
 
 .chapter-picker{display:grid;gap:10px;font-size:13px;margin:25px 0}.chapter-picker select{max-width:100%;width:100%}.seminar-plan{border:1px solid var(--line);border-radius:10px;padding:6px 18px;margin:20px 0}.seminar-plan>summary{padding:16px 0}.task-page .reading-return{margin-top:15px}
+
+.reference-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.reference-actions .btn{white-space:nowrap}
+#cheatsheet{width:min(720px,calc(100% - 24px));padding:0;overflow:hidden;max-height:85vh;max-height:85dvh}
+#cheatsheet[open]{display:flex;flex-direction:column}
+#cheatsheet .dialog-head{flex-shrink:0;border-bottom:1px solid var(--line);padding:17px 24px}
+#cheatsheet .dialog-head .btn{min-height:44px;white-space:nowrap}
+.cheatsheet-content{overflow:auto;padding:0 24px 14px;overscroll-behavior:contain}
+.cheatsheet-content details+details{border-top:1px solid var(--line)}
+.cheatsheet-content details[open]{padding-bottom:18px}
+.cheatsheet-content summary{font-size:1.05rem}
+.formula-list{margin:10px 0}
+.formula-list>div{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:6px 18px;padding:7px 0;border-top:1px solid var(--line)}
+.formula-list dt{font-size:.9rem;color:var(--muted)}
+.formula-list dd{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:1.08rem;overflow-wrap:anywhere}
+.reference-note{font-size:.89rem;color:var(--muted)}
+.angle-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.angle-table :is(th,td){text-align:center;padding:7px 4px;border-bottom:1px solid var(--line)}
+.angle-table thead{background:var(--wash)}
+.angle-table+.reference-note{margin-top:12px}
+@media(max-width:760px){
+ .reference-actions{gap:9px}
+ .reference-actions .btn{font-size:12px;min-height:44px;padding-inline:2px}
+}
+@media(max-width:520px){
+ #cheatsheet .dialog-head{padding:11px 15px}
+ .cheatsheet-content{padding:0 15px 12px}
+ .formula-list>div{grid-template-columns:1fr;gap:1px}
+ .angle-table{font-size:.87rem}
+}

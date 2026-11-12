@@ -8,6 +8,7 @@ import {SYLLABUS,PROGRAM_SOURCE} from './syllabus.js';
 import {foundationLab,foundationOutput,normaliseFoundation} from './foundation-models.js';
 import {PROOFS,PROOF_BY_ID} from './proofs.js';
 import {SEMINARS} from './seminar-content.js';
+import {CHEATSHEET_HTML} from './cheatsheet.js';
 import {guidePanel,returnLink,readingBackLink,proofLinks,proofsPage,proofPage,seminarsPage,seminarCards,sourceCard} from './reading-ui.js';
 const $=s=>document.querySelector(s);
 const nativeAndroid=typeof window.SynAndroid?.saveJson==='function';
@@ -42,11 +43,12 @@ function coverArt(small=false){
 }
 function shell(body,r){
  const total=stats(state);document.body.classList.toggle('reduce-motion',state.prefs.reduceMotion);
- return '<header class="topbar"><a class="brand" href="#home" aria-label="SYN Study — к разделам"><span class="brand-mark">SYN<span>•</span></span><span class="brand-sub">STUDY<br>МАТЕМАТИЧЕСКИЙ АНАЛИЗ</span></a><nav aria-label="Основная навигация">'+[['home','Разделы'],['seminars','Практикум'],['proofs','Доказательства'],['review','Повторение'],['results','Результаты'],['data','Данные']].map(([p,t])=>'<a href="#'+p+'" '+(r.page===p?'aria-current="page"':'')+'>'+t+'</a>').join('')+'</nav>'+button('Словарь ↗','glossary','','quiet')+'</header>'+
+ return '<header class="topbar"><a class="brand" href="#home" aria-label="SYN Study — к разделам"><span class="brand-mark">SYN<span>•</span></span><span class="brand-sub">STUDY<br>МАТЕМАТИЧЕСКИЙ АНАЛИЗ</span></a><nav aria-label="Основная навигация">'+[['home','Разделы'],['seminars','Практикум'],['proofs','Доказательства'],['review','Повторение'],['results','Результаты'],['data','Данные']].map(([p,t])=>'<a href="#'+p+'" '+(r.page===p?'aria-current="page"':'')+'>'+t+'</a>').join('')+'</nav>'+'<div class="reference-actions">'+button('Шпаргалка','cheatsheet','aria-haspopup="dialog"','quiet')+button('Словарь','glossary','aria-haspopup="dialog"','quiet')+'</div></header>'+
  (store.sandbox?'<div class="sandbox-banner"><strong>Пробный режим.</strong> Основной прогресс не меняется. '+button('Вернуться к основному прогрессу','end-sandbox','','small')+'</div>':'')+
  '<div id="save-warning" class="warning" role="alert" '+(!store.problem?'hidden':'')+'>'+esc(store.problem)+'</div>'+
  '<main id="main" tabindex="-1">'+body+'</main><footer class="footer"><span>SYN Study <span class="muted">/ '+VERSION+'</span></span><span data-save-label>'+ (store.problem?'Не сохранено · откройте Данные':store.sandbox?'Пробный прогресс сохранён':'Сохранено на этом устройстве')+'</span><span>'+total.independent+' / '+total.total+' с первой попытки · базовая практика</span></footer>'+
- '<dialog id="glossary" aria-labelledby="glossary-title"><div class="dialog-head"><h2 id="glossary-title">Обозначения и определения</h2>'+button('Закрыть ×','close-glossary','','quiet')+'</div><dl class="glossary">'+GLOSSARY.map(([a,b])=>'<div><dt>'+esc(a)+'</dt><dd>'+esc(b)+'</dd></div>').join('')+'</dl></dialog>';
+ '<dialog id="glossary" aria-labelledby="glossary-title"><div class="dialog-head"><h2 id="glossary-title">Обозначения и определения</h2>'+button('Закрыть ×','close-glossary','','quiet')+'</div><dl class="glossary">'+GLOSSARY.map(([a,b])=>'<div><dt>'+esc(a)+'</dt><dd>'+esc(b)+'</dd></div>').join('')+'</dl></dialog>'+
+ '<dialog id="cheatsheet" aria-labelledby="cheatsheet-title"><div class="dialog-head"><h2 id="cheatsheet-title">Шпаргалка</h2>'+button('Закрыть ×','close-cheatsheet','aria-label="Закрыть шпаргалку"','quiet')+'</div>'+CHEATSHEET_HTML+'</dialog>';
 }
 function home(){
  const s=stats(state),resume=state.resume;
@@ -283,11 +285,19 @@ document.addEventListener('click',e=>{
   if(a==='semester'){state.study.semester=Number(el.dataset.value);save();render();const plan=$('.seminar-plan');if(plan)plan.open=true;}
   if(a==='guide'){const panel=el.dataset.panel;const g=state.study.panels[id]||={};g[panel]=!g[panel];if(g[panel]&&['hint','example','solution'].includes(panel)){if(currentRoute.page==='test'&&state.test.draft){if(!state.test.draft.hints.includes(id))state.test.draft.hints.push(id);}else event(state,id,panel==='solution'?'reveal':'hint');}save();render();if(g[panel]){const target=$('#guide-'+id+'-'+panel);target?.scrollIntoView({block:'nearest'});focusReading('#guide-'+id+'-'+panel);}}
   if(['proof-next','proof-all','proof-first'].includes(a)){const id=el.dataset.proof,p=PROOF_BY_ID[id],n=state.study.proofSteps[id]||1;state.study.proofSteps[id]=a==='proof-all'?p.steps.length:a==='proof-first'?1:Math.min(p.steps.length,n+1);save();render();if(a==='proof-next'){const step=$('.proof-reader .reasoned-steps>li:last-child');if(step){step.tabIndex=-1;step.focus({preventScroll:true});step.scrollIntoView({block:'nearest'});}}}
-  if(a==='glossary'){
-   if(currentRoute?.page==='test'&&currentRoute.sub==='run'&&state.test.draft){const d=state.test.draft,id=testQuestions(d)[d.index].id;if(!d.hints.includes(id))d.hints.push(id);save();announce('Словарь в этом вопросе отмечен как помощь.');}
-   $('#glossary').showModal();$('#glossary button').focus();
+  if(a==='glossary'||a==='cheatsheet'){
+   if(currentRoute?.page==='test'&&currentRoute.sub==='run'&&state.test.draft){
+    const draft=state.test.draft,question=testQuestions(draft)[draft.index];
+    if(!draft.hints.includes(question.id))draft.hints.push(question.id);
+    save();
+    announce(a==='glossary'?'Словарь в этом вопросе отмечен как помощь.':'Шпаргалка в этом вопросе отмечена как помощь.');
+   }
+   const dialog=$('#'+a);
+   dialog.showModal();
+   dialog.querySelector('button').focus();
   }
   if(a==='close-glossary')$('#glossary').close();
+  if(a==='close-cheatsheet')$('#cheatsheet').close();
   if(a==='collect'){state.chapters[el.dataset.chapter].collected=true;save();render();announce('Итоги главы сохранены.');}
   if(a==='rel-input'){state.labs.relationInput=Number(el.dataset.value);save();render();}
   if(a==='rel-check'){state.labs.checked=true;save();render();}

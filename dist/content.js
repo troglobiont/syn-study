@@ -6,7 +6,7 @@ import {YEAR_TWO_PRACTICE,YEAR_TWO_TEST} from './year-two-questions.js';
 import {SEMINAR_QUESTIONS} from './seminar-content.js';
 export {SEMINAR_QUESTIONS} from './seminar-content.js';
 import {arrangeCourse} from './syllabus.js';
-export const VERSION = '1.4.2';
+export const VERSION = '1.4.3';
 const choice = (id, label, options, answer) => ({id, type:'choice', label, options:options.map((text,i)=>({id:String(i),text})), answer:String(answer)});
 const multi = (id, label, options, answer) => ({...choice(id,label,options,0),type:'multi',answer:answer.map(String)});
 const number = (id,label,answer,rule='equal') => ({id,type:'number',label,answer,rule});

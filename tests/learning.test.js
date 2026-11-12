@@ -109,6 +109,7 @@ test('new drafts, read solutions, proof position and pins survive export/import 
  const n=importText(exportText(s));assert.deepEqual(n,normalise(s));assert.ok(reviewIds(n).includes(q.id));assert.equal(n.study.proofSteps['bolzano-weierstrass'],5);assert.equal(n.resume.question,q.id);assert.equal(n.records[q.id].draft.a,'123');
  assert.deepEqual(normalise({...s,contentVersion:'1.4.0'}),n);
  assert.deepEqual(normalise({...s,contentVersion:'1.4.1'}),n);
+ assert.deepEqual(normalise({...s,contentVersion:'1.4.2'}),n);
 });
 test('untrusted study state is bounded and catalogue rendering escapes query text',()=>{
  const s=fresh();s.study={panels:{evil:{solution:true}},proofSteps:{evil:999,'bolzano-weierstrass':999999},semester:999,query:'<script>alert(1)</script>',returnTo:'__proto__'};const n=normalise(s);assert.equal(n.study.returnTo,null);assert.equal(n.study.panels.evil,undefined);assert.equal(n.study.proofSteps.evil,undefined);assert.equal(n.study.proofSteps['bolzano-weierstrass'],PROOF_BY_ID['bolzano-weierstrass'].steps.length);assert.ok(!seminarCards(n).includes('<script>'));

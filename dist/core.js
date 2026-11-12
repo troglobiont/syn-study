@@ -133,7 +133,7 @@ function testAnswers(raw){
 }
 export function normalise(raw){
  // Existing question identities, answers and test scopes survive additive course updates.
- if(!obj(raw)||raw.schemaVersion!==1||!['1.0.0','1.0.1','1.1.0','1.2.0','1.3.0','1.4.0','1.4.1',VERSION].includes(raw.contentVersion)||!obj(raw.records)||!obj(raw.chapters)||!obj(raw.test))error('Файл не соответствует поддерживаемой версии SYN Study. Исходные данные не изменены.');
+ if(!obj(raw)||raw.schemaVersion!==1||!['1.0.0','1.0.1','1.1.0','1.2.0','1.3.0','1.4.0','1.4.1','1.4.2',VERSION].includes(raw.contentVersion)||!obj(raw.records)||!obj(raw.chapters)||!obj(raw.test))error('Файл не соответствует поддерживаемой версии SYN Study. Исходные данные не изменены.');
  const s=fresh();
  for(const q of QUESTIONS)if(own(raw.records,q.id))s.records[q.id]=normalRecord(q,raw.records[q.id]);
  for(const {id} of CHAPTERS){
@@ -141,7 +141,7 @@ export function normalise(raw){
   s.chapters[id]={stage:stages.includes(c.stage)?c.stage:'meaning',index:int(c.index,0,PRACTICE.filter(q=>q.chapter===id).length-1),visited:Array.isArray(c.visited)?[...new Set(c.visited.filter(x=>stages.includes(x)))]:[],collected:c.collected===true};
  }
  const legacy75=[...Array.from({length:10},(_,i)=>i+1),...Array.from({length:30},(_,i)=>i+31),11,12,13,14,15,...Array.from({length:15},(_,i)=>i+61),...Array.from({length:15},(_,i)=>i+16)].map(i=>'t-'+i);
- const scope=run=>{const ids=Array.isArray(run.questionIds)?[...new Set(run.questionIds.filter(id=>TEST.some(q=>q.id===id)))]:['1.3.0','1.4.0','1.4.1',VERSION].includes(raw.contentVersion)?TEST.map(q=>q.id):raw.contentVersion==='1.2.0'?legacy75:Array.from({length:raw.contentVersion==='1.1.0'?30:10},(_,i)=>'t-'+(i+1));return ids.length?ids:Array.from({length:10},(_,i)=>'t-'+(i+1));};
+ const scope=run=>{const ids=Array.isArray(run.questionIds)?[...new Set(run.questionIds.filter(id=>TEST.some(q=>q.id===id)))]:['1.3.0','1.4.0','1.4.1','1.4.2',VERSION].includes(raw.contentVersion)?TEST.map(q=>q.id):raw.contentVersion==='1.2.0'?legacy75:Array.from({length:raw.contentVersion==='1.1.0'?30:10},(_,i)=>'t-'+(i+1));return ids.length?ids:Array.from({length:10},(_,i)=>'t-'+(i+1));};
  const d=raw.test.draft;
  if(obj(d))s.test.draft={questionIds:scope(d),seed:typeof d.seed==='string'?d.seed.slice(0,80):'legacy',answers:testAnswers(d.answers),hints:Array.isArray(d.hints)?[...new Set(d.hints.filter(id=>TEST.some(q=>q.id===id)))]:[],index:int(d.index,0,scope(d).length-1)};
  for(const run of (Array.isArray(raw.test.runs)?raw.test.runs:[]).slice(-20)){
