@@ -5,7 +5,7 @@ import {BOOK_EXERCISES} from '../dist/book-exercises.js';
 import {BY_ID,CHAPTERS} from '../dist/content.js';
 import {exportText,fresh,grade,importText,record,reviewIds,stats,submit} from '../dist/core.js';
 import {guideFor,guidePanel} from '../dist/reading-ui.js';
-import {bookRoute,booksPage,bookTask,firstBookSection} from '../dist/books-ui.js';
+import {bookRoute,booksPage,bookTask,bookTaskList,firstBookSection} from '../dist/books-ui.js';
 
 test('all three editions have checked paragraph locations, working routes and complete exercise guides', () => {
  const state=fresh(), used=new Set();
@@ -59,4 +59,35 @@ test('new book problems grade, save and share progress without changing course t
  const guide=guidePanel(q,saved,{fromBook:true});
  assert.match(guide,/data-reading-link/);
  assert.match(guide,/1\/750/);
+});
+
+test('Kudryavtsev notes appear before a worked example and the list of exercise statements', () => {
+ const state=fresh();
+ for(const book of BOOKS.slice(0,2)){
+  const sections=BOOK_SECTIONS.filter(s=>s.book===book);
+  for(const section of sections){
+   const html=booksPage(state,book,section);
+   const theory=html.indexOf('Теория параграфа');
+   const example=html.indexOf('Разобранный пример SYN');
+   const tasks=html.indexOf('<h2>Задачи SYN</h2>');
+   assert.ok(theory>=0&&theory<example&&example<tasks,section.id);
+   assert.match(html,/data-reading-link/);
+  }
+ }
+});
+
+test('all-exercise indexes include condition previews and preserve secondary chapter references', () => {
+ const state=fresh();
+ assert.deepEqual(bookRoute(['books','tasks']),{page:'books',tasks:true});
+ for(const book of [undefined,...BOOKS]){
+  const href=book?['books',book.id,'tasks']:['books','tasks'];
+  assert.equal(bookRoute(href).book,book);
+  const ids=new Set(BOOK_SECTIONS.filter(s=>!book||s.book===book).flatMap(s=>s.exercises));
+  const html=bookTaskList(state,book);
+  assert.equal((html.match(/class="book-exercise"/g)||[]).length,ids.size);
+  assert.match(html,/id="book-task-search"/);
+ }
+ const sample=bookTaskList(state,BOOKS[0]);
+ assert.match(sample,/data-book-search="[^"]*Асимптоты и координаты графика[^"]*Построение графика по свойствам функции[^"]*"/);
+ assert.match(sample,/Найдите наклонную асимптоту/);
 });

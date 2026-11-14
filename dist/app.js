@@ -8,7 +8,7 @@ import {SYLLABUS,PROGRAM_SOURCE} from './syllabus.js';
 import {foundationLab,foundationOutput,normaliseFoundation} from './foundation-models.js';
 import {PROOFS,PROOF_BY_ID} from './proofs.js';
 import {SEMINARS} from './seminar-content.js';
-import {bookRoute, booksPage, bookTask, firstBookSection} from './books-ui.js';
+import {bookRoute, booksPage, bookTask, firstBookSection, bookTaskList, filterBookTasks} from './books-ui.js';
 import {CHEATSHEET_HTML} from './cheatsheet.js';
 import {guidePanel,returnLink,readingBackLink,proofLinks,proofsPage,proofPage,seminarsPage,seminarCards,sourceCard} from './reading-ui.js';
 const $=s=>document.querySelector(s);
@@ -109,11 +109,11 @@ function practice(c){
  (s.last?'<div class="feedback '+(s.last.correct?'success':'neutral')+'" role="status"><strong>'+(s.last.correct?'Верно':'Ответ пока не совпал')+'</strong><p>'+(s.last.correct?'Можно перейти дальше или посмотреть обоснование в решении.':'Можно исправить ответ, открыть подсказку или сразу читать решение.')+'</p></div>':'')+
  '<div class="stage-footer">'+(index>0?button('← Предыдущая','prev-question','data-chapter="'+c.id+'"') :link('← К примерам','lesson/'+c.id+'/lab'))+button(index<qs.length-1?'Следующая задача →':'К итогам главы →','next-question','data-chapter="'+c.id+'"','primary')+'</div>';
 }
-function taskPage(id,section){
+function taskPage(id,section,origin){
  const q=BY_ID[id],rec=state.records[id],s=status(rec,q),source=SEMINARS.find(x=>x.id===q.seminarId),qs=SEMINAR_QUESTIONS.filter(x=>x.chapter===q.chapter),i=qs.findIndex(x=>x.id===id);
  const context=bookTask(section,id);
  const back=context?.back||'seminars/chapter/'+q.chapter;
- return '<section class="reading-page task-page"><p>'+link(context?'← К параграфу':'← К практике главы',back,'quiet')+'</p><p class="eyebrow">'+(context?esc(context.label):(q.id.startsWith('s-')?'Задача SYN по семинарской теме':'Свободный разбор задачи')+' · '+CHAPTERS.find(c=>c.id===q.chapter).title)+'</p><h1>'+esc(q.title)+'</h1><p class="question-prompt">'+esc(q.prompt)+'</p>'+answerForm(q,rec?.draft)+guidePanel(q,state,{fromBook:!!context})+'<div class="help-actions">'+button(s.pinned?'Убрать отметку повторения':'Отметить для повторения','pin','data-question="'+id+'"','quiet')+'</div>'+(s.last?'<div class="feedback '+(s.last.correct?'success':'neutral')+'" role="status"><strong>'+(s.last.correct?'Верно':'Ответ пока не совпал')+'</strong><p>Можно продолжить решение или открыть разбор.</p></div>':'')+(!context&&source?'<details class="sources"><summary>Семинар и задания из задачника</summary>'+sourceCard(source)+'</details>':'')+'<div class="stage-footer">'+(context?link(context.previous===back?'← К параграфу':'← Предыдущая задача',context.previous)+link(context.next===back?'К параграфу':'Следующая задача →',context.next,'primary'):(i>0?link('← Предыдущая задача','task/'+qs[i-1].id):link('К практике главы',back))+(i>=0&&i+1<qs.length?link('Следующая задача →','task/'+qs[i+1].id,'primary'):''))+'</div></section>';
+ return '<section class="reading-page task-page">'+(readingBackLink(origin)||'<p>'+link(context?'← К параграфу':'← К практике главы',back,'quiet')+'</p>')+'<p class="eyebrow">'+(context?esc(context.label):(q.id.startsWith('s-')?'Задача SYN по семинарской теме':'Свободный разбор задачи')+' · '+CHAPTERS.find(c=>c.id===q.chapter).title)+'</p><h1>'+esc(q.title)+'</h1><p class="question-prompt">'+esc(q.prompt)+'</p>'+answerForm(q,rec?.draft)+guidePanel(q,state,{fromBook:!!context})+'<div class="help-actions">'+button(s.pinned?'Убрать отметку повторения':'Отметить для повторения','pin','data-question="'+id+'"','quiet')+'</div>'+(s.last?'<div class="feedback '+(s.last.correct?'success':'neutral')+'" role="status"><strong>'+(s.last.correct?'Верно':'Ответ пока не совпал')+'</strong><p>Можно продолжить решение или открыть разбор.</p></div>':'')+(!context&&source?'<details class="sources"><summary>Семинар и задания из задачника</summary>'+sourceCard(source)+'</details>':'')+'<div class="stage-footer">'+(context?link(context.previous===back?'← К параграфу':'← Предыдущая задача',context.previous)+link(context.next===back?'К параграфу':'Следующая задача →',context.next,'primary'):(i>0?link('← Предыдущая задача','task/'+qs[i-1].id):link('К практике главы',back))+(i>=0&&i+1<qs.length?link('Следующая задача →','task/'+qs[i+1].id,'primary'):''))+'</div></section>';
 }
 function testPage(r){
  const d=state.test.draft,qs=testQuestions(d);
@@ -145,8 +145,13 @@ function render(){
  else if(r.page==='task')state.resume={page:'task',chapter:BY_ID[r.question].chapter,question:r.question};
  else if(r.page==='proof')state.resume={page:'proof',chapter:PROOF_BY_ID[r.proof].chapter,proof:r.proof};
  else if(r.page==='test'&&r.sub==='run')state.resume={page:'test',chapter:'one'};
- const body=r.page==='books'?booksPage(state,r.book,r.section):r.page==='seminars'?'<div class="book-entry">'+link('Задачники','books')+'</div>'+seminarsPage(state,r.chapter):r.page==='proofs'?proofsPage(r.chapter):r.page==='proof'?proofPage(r.proof,state,origin):r.page==='task'?taskPage(r.question,r.bookSection):r.page==='home'?home():r.page==='lesson'?lesson(r,origin):r.page==='test'?testPage(r):r.page==='results'?results():r.page==='review'?review():dataPage();
+ const body=r.page==='books'?(r.tasks?bookTaskList(state,r.book):booksPage(state,r.book,r.section)):r.page==='seminars'?'<div class="book-entry">'+link('Задачники','books')+'</div>'+seminarsPage(state,r.chapter):r.page==='proofs'?proofsPage(r.chapter):r.page==='proof'?proofPage(r.proof,state,origin):r.page==='task'?taskPage(r.question,r.bookSection,origin):r.page==='home'?home():r.page==='lesson'?lesson(r,origin):r.page==='test'?testPage(r):r.page==='results'?results():r.page==='review'?review():dataPage();
  $('#app').innerHTML=shell(body,r);
+ if(r.tasks&&typeof history.state?.bookQuery==='string'){
+  const search=$('#book-task-search');
+  search.value=history.state.bookQuery;
+  filterBookTasks($('.book-task-list'),search.value);
+ }
  if(!store.blocked)save();
  document.title='SYN Study · '+(r.page==='lesson'?CHAPTERS.find(c=>c.id===r.chapter).title:'Математический анализ');
 }
@@ -208,6 +213,10 @@ document.addEventListener('submit',e=>{
  else{submit(state,id,a);save();render();$('.feedback')?.scrollIntoView({block:'nearest',behavior:'instant'});focusReading('.feedback');}
 });
 document.addEventListener('input',e=>{
+ if(e.target.id==='book-task-search'){
+  history.replaceState({...history.state,bookQuery:e.target.value.slice(0,120)},'');
+  filterBookTasks($('.book-task-list'),e.target.value);
+ }
  if(e.target.closest('#answer-form'))draftChanged();
  if(e.target.dataset.yearField){const key=e.target.dataset.yearField;state.yearTwo=normaliseYearTwo({...state.yearTwo,[key]:['mode','domain'].includes(key)?e.target.value:Number(e.target.value)});save();const out=document.querySelector('[data-year-value="'+key+'"]');if(out)out.textContent=state.yearTwo[key].toLocaleString('ru-RU');$('#year-two-output').innerHTML=yearTwoOutput(currentRoute.chapter,state.yearTwo);}
  if(e.target.dataset.foundationField){const key=e.target.dataset.foundationField;state.foundation=normaliseFoundation({...state.foundation,[key]:Number(e.target.value)});save();const out=document.querySelector('[data-foundation-value="'+key+'"]');if(out)out.textContent=state.foundation[key].toLocaleString('ru-RU');$('#foundation-model-output').innerHTML=foundationOutput(currentRoute.chapter,state.foundation);}
@@ -249,6 +258,8 @@ function followReadingLink(e){
  const title=topic?.querySelector('h3').textContent;
  let label='← Вернуться к предыдущей странице';
  if(title)label='← Вернуться к пункту «'+title+'»';
+ else if(currentRoute.tasks)label='← Вернуться к списку задач';
+ else if(currentRoute.page==='books'&&currentRoute.section)label='← Вернуться к параграфу';
  else if(currentRoute.page==='task')label='← Вернуться к задаче';
  else if(currentRoute.page==='proof')label='← Вернуться к доказательству';
  else if(currentRoute.page==='proofs')label='← Вернуться к списку доказательств';

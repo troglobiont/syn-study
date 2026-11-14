@@ -7,7 +7,7 @@ import {BOOK_EXERCISES} from './book-exercises.js';
 import {SEMINAR_QUESTIONS} from './seminar-content.js';
 export {SEMINAR_QUESTIONS} from './seminar-content.js';
 import {arrangeCourse} from './syllabus.js';
-export const VERSION = '1.5.0';
+export const VERSION = '1.5.1';
 const choice = (id, label, options, answer) => ({id, type:'choice', label, options:options.map((text,i)=>({id:String(i),text})), answer:String(answer)});
 const multi = (id, label, options, answer) => ({...choice(id,label,options,0),type:'multi',answer:answer.map(String)});
 const number = (id,label,answer,rule='equal') => ({id,type:'number',label,answer,rule});
