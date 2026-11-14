@@ -3,10 +3,11 @@ import {FOUNDATION_CHAPTERS} from './foundation-content.js';
 import {FOUNDATION_PRACTICE,FOUNDATION_TEST} from './foundation-questions.js';
 import {YEAR_TWO_CHAPTERS} from './year-two-content.js';
 import {YEAR_TWO_PRACTICE,YEAR_TWO_TEST} from './year-two-questions.js';
+import {BOOK_EXERCISES} from './book-exercises.js';
 import {SEMINAR_QUESTIONS} from './seminar-content.js';
 export {SEMINAR_QUESTIONS} from './seminar-content.js';
 import {arrangeCourse} from './syllabus.js';
-export const VERSION = '1.4.3';
+export const VERSION = '1.5.0';
 const choice = (id, label, options, answer) => ({id, type:'choice', label, options:options.map((text,i)=>({id:String(i),text})), answer:String(answer)});
 const multi = (id, label, options, answer) => ({...choice(id,label,options,0),type:'multi',answer:answer.map(String)});
 const number = (id,label,answer,rule='equal') => ({id,type:'number',label,answer,rule});
@@ -102,7 +103,7 @@ q('t-10','two','Инъективность без сюръективности',
 ];
 
 export const QUESTIONS = [...PRACTICE,...TEST];
-export const ALL_QUESTIONS=[...QUESTIONS,...SEMINAR_QUESTIONS];
+export const ALL_QUESTIONS=[...QUESTIONS,...SEMINAR_QUESTIONS,...BOOK_EXERCISES];
 export const BY_ID = Object.fromEntries(ALL_QUESTIONS.map(q=>[q.id,q]));
 export const CHAPTERS = [
 {id:'one',number:'01',title:'Множества, отношения и функции',subtitle:'Принадлежность, включение, определение функции, кванторы и композиция.',symbol:'f: A → B',card:'Определение функции и композиции',takeaway:'Функция f: A → B сопоставляет каждому x ∈ A ровно один элемент f(x) ∈ B. Равенство f(x₁)=f(x₂) при x₁≠x₂ не противоречит определению функции. Для r: A → B и s: B → C композиция определяется равенством (s∘r)(x)=s(r(x)).',

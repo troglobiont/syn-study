@@ -91,3 +91,19 @@
  .formula-list>div{grid-template-columns:1fr;gap:1px}
  .angle-table{font-size:.87rem}
 }
+
+/* Book paragraph navigation */
+.book-entry{max-width:900px;margin:24px auto -16px}
+.book-sections{list-style:none;padding:0;margin:8px 0 30px}
+.book-sections li{border-bottom:1px solid var(--line)}
+.book-sections a{display:grid;grid-template-columns:7.5rem minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:14px 2px;text-decoration:none}
+.book-sections a:hover span:nth-child(2){text-decoration:underline}
+.book-ref,.book-progress{font-size:.83rem;color:var(--muted);white-space:nowrap}
+.book-group{scroll-margin-top:20px}
+.book-paragraph .review-row h2{margin:0;font-size:1.18rem}
+@media(max-width:760px){
+ .topbar nav{flex-wrap:wrap;justify-content:flex-start}
+ .book-sections a{grid-template-columns:minmax(0,1fr) auto;gap:4px 12px}
+ .book-sections a span:nth-child(2){grid-column:1;grid-row:2}
+ .book-progress{grid-column:2;grid-row:2}
+}

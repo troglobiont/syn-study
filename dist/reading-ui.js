@@ -20,6 +20,10 @@ export function knowledgeLinks(refs,returnTo='',fromProof=false){
 export function stepList(steps){return '<ol class="reasoned-steps">'+steps.map((s,i)=>'<li><span class="step-number">Шаг '+(i+1)+'</span><p class="step-claim">'+e(s.claim)+'</p><div class="step-reason"><strong>Почему этот переход верен</strong><p>'+e(s.reason)+'</p>'+(s.uses?.length?'<p>Используем: '+s.uses.map(id=>a(PROOF_BY_ID[id]?.title||id,'proof/'+id,'data-reading-link')).join('; ')+'.</p>':'')+'</div></li>').join('')+'</ol>';}
 const topicMap={one:[0,2,3,4,5],two:[0,2,1,3,5],real:[3,4,8,7,5],sequences:[0,0,9,7,5],limits:[0,1,5,4,10],derivatives:[0,0,3,5,10],numeric:[0,0,4,3,1],indefinite:[0,2,3,4,0],three:[0,3,4,5,7],improper:[0,0,2,5,4],space:[1,3,7,7,2],continuity:[6,3,4,0,7],four:[1,3,4,6,7],five:[0,0,5,4,7],higher:[0,1,2,4,5],smooth:[1,2,4,5,1],measure:[3,2,3,4,5],lebesgue:[0,2,4,1,5],multiple:[6,1,2,4,5],parameters:[3,4,1,3,5],uniformintegrals:[2,0,1,5,3],approximation:[2,3,3,6,0],surface:[2,4,5,3,6],forms:[0,1,6,6,3],six:[1,2,5,9,6],fourier:[1,2,7,5,8]};
 export function guideFor(q){
+ if(q.theoryAnchor){
+  const topic=CHAPTERS.find(c=>c.id===q.chapter).theory.find(t=>t.anchor===q.theoryAnchor);
+  return {...q, prerequisites:[{chapter:q.chapter,topic:topic.title}]};
+ }
  if(q.solution)return q;
  const c=CHAPTERS.find(c=>c.id===q.chapter),qs=q.id.startsWith('t-')?TEST.filter(t=>t.chapter===c.id):PRACTICE.filter(t=>t.chapter===c.id),i=Math.max(0,qs.findIndex(t=>t.id===q.id));
  const anchor="topic-"+(topicMap[c.id]?.[i]??0);
@@ -29,15 +33,16 @@ export function guideFor(q){
 }
 export function answerText(q){return q.parts.map(p=>p.type==='choice'?p.options.find(o=>o.id===p.answer)?.text:p.type==='multi'?p.answer.map(id=>p.options.find(o=>o.id===id)?.text).join('; '):p.type==='set'?'{'+p.answer.join('; ')+'}':p.rule==='notEqual'?'Любое допустимое число, отличное от '+p.answer:String(p.answer)).join(' · ');}
 function exampleFor(c,refs=[]){const candidates=SEMINAR_QUESTIONS.filter(q=>q.chapter===c.id);const score=q=>(q.prerequisites||[]).filter(r=>refs.some(p=>p.chapter===r.chapter&&p.topic===r.topic)).length;const q=candidates.sort((a,b)=>score(b)-score(a))[0];return q?.analogous||null;}
-export function guidePanel(q,state){const g=guideFor(q),p=state.study.panels[q.id]||{};
+export function guidePanel(q,state,{fromBook=false}={}){const g=guideFor(q),p=state.study.panels[q.id]||{};
+ const knowledge=knowledgeLinks(g.prerequisites||[],fromBook?'':q.id,fromBook);
  const controls=[['knowledge','Необходимые знания'],['hint','Подсказка'],['example','Похожий пример'],['solution','Показать решение']];
  return '<section class="task-help" aria-label="Помощь к задаче"><p class="caption">Можно сразу читать решение или попробовать самостоятельно. Любой порядок допустим.</p><div class="help-actions">'+controls.map(([key,label])=>btn(p[key]?(key==='solution'?'Скрыть решение':key==='example'?'Скрыть пример':key==='knowledge'?'Скрыть необходимые знания':'Скрыть подсказку'):label,'guide','data-question="'+q.id+'" data-panel="'+key+'" aria-expanded="'+!!p[key]+'" aria-controls="guide-'+q.id+'-'+key+'"',key==='solution'?'primary':'secondary')).join('')+'</div>'+
- (p.knowledge?'<aside class="help-section" id="guide-'+q.id+'-knowledge"><h3>Необходимые знания</h3><p>Откройте нужное определение или утверждение. Черновик задачи сохранён; ссылка для возврата будет рядом с материалом.</p>'+knowledgeLinks(g.prerequisites||[],q.id)+'</aside>':'')+
- (p.hint?'<aside class="hint-box" id="guide-'+q.id+'-hint"><h3>Подсказка</h3><p>'+e(q.hint)+'</p>'+knowledgeLinks(g.prerequisites||[],q.id)+'</aside>':'')+
- (p.example&&g.analogous?'<section class="help-section" id="guide-'+q.id+'-example"><p class="eyebrow">'+(q.id.startsWith('s-')?'Другой пример на тот же метод':'Разобранный пример из этой главы')+'</p><h3>'+e(g.analogous.title)+'</h3><p>'+e(g.analogous.statement)+'</p>'+stepList(g.analogous.steps)+'<p class="solution-result">'+e(g.analogous.result)+'</p></section>':'')+
- (p.solution?'<section class="help-section solution-panel" id="guide-'+q.id+'-solution"><p class="eyebrow">Решение открыто для чтения</p><h3>Решение по шагам</h3><p>'+e(g.solution.strategy)+'</p>'+stepList(g.solution.steps)+'<div class="solution-result"><strong>Ответ</strong><p>'+e(g.solution.result||answerText(q))+'</p></div>'+knowledgeLinks(g.prerequisites||[],q.id)+'</section>':'')+'</section>';
+ (p.knowledge?'<aside class="help-section" id="guide-'+q.id+'-knowledge"><h3>Необходимые знания</h3><p>Откройте нужное определение или утверждение. Черновик задачи сохранён; ссылка для возврата будет рядом с материалом.</p>'+(g.knowledge?'<p>'+e(g.knowledge)+'</p>':'')+knowledge+'</aside>':'')+
+ (p.hint?'<aside class="hint-box" id="guide-'+q.id+'-hint"><h3>Подсказка</h3><p>'+e(q.hint)+'</p>'+knowledge+'</aside>':'')+
+ (p.example&&g.analogous?'<section class="help-section" id="guide-'+q.id+'-example"><p class="eyebrow">'+((fromBook||q.id.startsWith('s-'))?'Другой пример на тот же метод':'Разобранный пример из этой главы')+'</p><h3>'+e(g.analogous.title)+'</h3><p>'+e(g.analogous.statement)+'</p>'+stepList(g.analogous.steps)+(g.analogous.result?'<p class="solution-result">'+e(g.analogous.result)+'</p>':'')+'</section>':'')+
+ (p.solution?'<section class="help-section solution-panel" id="guide-'+q.id+'-solution"><p class="eyebrow">Решение открыто для чтения</p><h3>Решение по шагам</h3><p>'+e(g.solution.strategy)+'</p>'+stepList(g.solution.steps)+'<div class="solution-result"><strong>Ответ</strong><p>'+e(g.solution.result||answerText(q))+'</p></div>'+knowledge+'</section>':'')+'</section>';
 }
-export function returnLink(state){const id=state.study.returnTo,q=BY_ID[id];return q?'<aside class="reading-return">'+a('← Вернуться к задаче: '+q.title,id.startsWith('s-')?'task/'+id:id.startsWith('t-')?'test/run':'lesson/'+q.chapter+'/practice','data-return-question="'+q.id+'"')+'</aside>':'';}
+export function returnLink(state){const id=state.study.returnTo,q=BY_ID[id];return q?'<aside class="reading-return">'+a('← Вернуться к задаче: '+q.title,(id.startsWith('s-')||id.startsWith('b-'))?'task/'+id:id.startsWith('t-')?'test/run':'lesson/'+q.chapter+'/practice','data-return-question="'+q.id+'"')+'</aside>':'';}
 export function readingBackLink(origin){
  if(!origin)return '';
  return '<aside class="reading-return">'+a(origin.label,e(origin.path),'data-reading-back')+'</aside>';
